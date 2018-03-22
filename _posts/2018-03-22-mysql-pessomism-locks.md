@@ -51,7 +51,7 @@ update t_goods set status=2;
 commit;
 
 ```
-<font color="#dd0000">注：</font>需要注意的是，在事务中，只有SELECT ... FOR UPDATE 或LOCK IN SHARE MODE 同一笔数据时会等待其它事务结束后才执行，一般SELECT ... 则不受此影响
+<font color="#dd0000">注：需要注意的是，在事务中，只有SELECT ... FOR UPDATE 或LOCK IN SHARE MODE 同一笔数据时会等待其它事务结束后才执行，一般SELECT ... 则不受此影响</font>
 
 **锁定级别与索引之间的关系**
 - 明确指定索引，并且有此数据，row lock
