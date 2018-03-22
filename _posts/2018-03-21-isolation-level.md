@@ -14,13 +14,13 @@ description: 深入分析事物的隔离级别。
 
 **隔离性中的问题：**
 <font color="#dd0000">脏读：A事物读取了B事物未提交更改的数据：</font>
-![脏读示例](https://github.com/ZhouJianBoPro/ZhouJianBoPro.github.io/blob/master/images/dirtyRead.png?raw=true)
+![脏读示例](images/dirtyRead.png)
 
 <font color="#0000dd">不可重复读：A事物读取了B事物已提交更改的数据：</font>
-![不可重复读示例](https://github.com/ZhouJianBoPro/ZhouJianBoPro.github.io/blob/master/images/unrepeatableRead.png?raw=true)
+![不可重复读示例](images/unrepeatableRead.png)
 
 <font color="#660066">幻读：A事物读取了B事物已提交新增的数据：</font>
-![幻读示例](https://github.com/ZhouJianBoPro/ZhouJianBoPro.github.io/blob/master/images/fantasyRead.png?raw=true)
+![幻读示例](images/fantasyRead.png)
 
 
 **隔离性**
