@@ -28,12 +28,12 @@ description: 深入分析事物的隔离级别。
 
 **事物四种隔离级别的比较**
 
-|隔离级别/读数据一致性及允许的并发副作用|读数据一致性|脏读|不可重复读|幻读|
+|隔离级别/读数据一致性及允许的并发副作用|脏读|不可重复读|幻读|
 |---|---|---|---|---|
-|未提交读(read uncommited)|||||
-|已提交读(read commited)|||||
-|可重复读(repeatable read)|||||
-|可序列化(serializable)|||||
+|未提交读(read uncommited)|允许|允许|允许|
+|已提交读(read commited)|脏读|允许|允许|
+|可重复读(repeatable read)|禁止|禁止|允许|
+|可序列化(serializable)|禁止|禁止|禁止|
 
 ### 未提交读（read uncommited）
 **描述**
