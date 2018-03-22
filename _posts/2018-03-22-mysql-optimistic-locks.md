@@ -35,3 +35,7 @@ select (status,status,version) from t_goods where id=#{id}
 update t_goods set status=2,version=version+1 where id=#{id} and version=#{version};
 ```
 
+**优势与不足**
+1. 乐观锁是相信事物之间的竞争的概率是比较少的，因此可以到提交的时候去锁定，进行数据校验。
+2. 乐观并发控制不会产生死锁和任何锁。
+3. 并发量较大的时候有可能存在风险，例如两个事务都读取了数据库的某一行，经过修改以后写回数据库，这时就遇到了问题。
