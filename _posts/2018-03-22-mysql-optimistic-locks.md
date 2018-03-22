@@ -12,7 +12,7 @@ description: 深入了解乐观锁。
 
 **实现乐观锁的两种方式**
 
-<font color="#660066">使用数据版本（version）记录机制实现：</font><br /> 
+<font color="#660066">使用数据版本（version）记录机制实现：</font>
 1. 在数据库表中增加数字类型的version的字段；
 2. 当读取数据时，将version字段的值一同读出，数据每更新一次，对此version值加一。
 3. 当我们提交更新的时候，判断数据库表对应记录的当前版本信息与第一次取出来的version值进行比对，如果数据库表当前版本号与第一次取出来的version值相等，则予以更新，否则认为是过期数据。
@@ -24,7 +24,7 @@ description: 深入了解乐观锁。
 **举例说明**
 > 商品goods表中有一个字段status，status为1代表商品未被下单，status为2代表商品已经被下单，那么我们对某个商品下单时必须确保该商品status为1。假设商品的id为1。
 
-<font color="#660066">操作步骤：</font><br />
+<font color="#660066">操作步骤：</font>
 ```$xslt
 #1.查询出商品信息
 select (status,status,version) from t_goods where id=#{id}
