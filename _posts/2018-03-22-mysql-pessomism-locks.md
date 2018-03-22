@@ -13,7 +13,8 @@ description: 深入了解悲观锁。
 **使用场景举例**
 > 商品goods表中有一个字段status，status为1代表商品未被下单，status为2代表商品已经被下单，那么我们对某个商品下单时必须确保该商品status为1。假设商品的id为1。
   
-1. 如果不采用锁，操作方法如下：
+如果不采用锁，操作方法如下：
+
 ```$xslt
 //1.查询出商品信息
 select status from t_goods where id=1;
