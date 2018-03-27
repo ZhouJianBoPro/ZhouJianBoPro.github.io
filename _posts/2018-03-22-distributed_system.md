@@ -13,9 +13,6 @@ description: 分布式系统简单了解
 
 ![分布式系统架构](/images/soa.png)
 
-<span id="Mark">
-此处为锚点位置。
-</span>
 
 **分布式系统可以解决哪些问题**
 1. 单击处理能力存在瓶颈，性能提升较小
@@ -30,7 +27,6 @@ description: 分布式系统简单了解
 - (Partition tolerance)可扩展性，分区容错：要求系统能够按需扩展
 - 大型网站一般使用AP，nosql追求AP，传统数据库最求CA    
 
-[定位至锚点位置](#Mark)
 
 
 
