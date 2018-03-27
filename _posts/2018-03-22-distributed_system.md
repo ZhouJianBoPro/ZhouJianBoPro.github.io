@@ -28,6 +28,7 @@ description: 分布式系统简单了解
 - 大型网站一般使用AP，nosql追求AP，传统数据库最求CA  
   
 **分布式session处理机制**
+
 [分布式session处理机制](http://boopro.cn/%E5%88%86%E5%B8%83%E5%BC%8F/2018/03/27/distributed-session/)
 
 
