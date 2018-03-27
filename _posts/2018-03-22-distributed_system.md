@@ -25,7 +25,10 @@ description: 分布式系统简单了解
 - (Consistency)一致性：事物保障，ACID模型
 - (Availiablity)可用性：避免单点，做到服务降级
 - (Partition tolerance)可扩展性，分区容错：要求系统能够按需扩展
-- 大型网站一般使用AP，nosql追求AP，传统数据库最求CA    
+- 大型网站一般使用AP，nosql追求AP，传统数据库最求CA  
+  
+**分布式session处理机制**
+[分布式session处理机制](http://boopro.cn/%E5%88%86%E5%B8%83%E5%BC%8F/2018/03/27/distributed-session/)
 
 
 
