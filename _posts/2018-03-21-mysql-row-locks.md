@@ -2,8 +2,8 @@
 layout: post
 title: 了解MySQL行级共享锁与排它锁
 date: 2018-03-21
-categories: 高并发
-tags: [高并发]
+categories: high concurrency
+tags: [concurrency]
 description: 深入了解MySQL行级共享、排它锁。
 ---
 

@@ -2,8 +2,8 @@
 layout: post
 title: mysql乐观锁学习总结
 date: 2018-03-22
-categories: 高并发
-tags: [高并发]
+categories: high concurrency
+tags: [concurrency]
 description: 深入了解乐观锁。
 ---
 

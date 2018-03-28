@@ -2,8 +2,8 @@
 layout: post
 title: 分布式系统简单了解
 date: 2018-03-26
-categories: 分布式
-tags: [分布式]
+categories: distributed environment
+tags: [distributed]
 description: 分布式系统简单了解
 ---
 

@@ -2,8 +2,8 @@
 layout: post
 title: 深入了解事物的隔离级别
 date: 2018-03-16
-categories: 高并发
-tags: [高并发]
+categories: high concurrency
+tags: [concurrency]
 description: 深入分析事物的隔离级别。
 ---
 **事物的ACID特性简称：**
