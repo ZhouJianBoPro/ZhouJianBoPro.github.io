@@ -85,29 +85,19 @@ public class CityRestController {
         //@RequestParam注解作用：表名表单中传递的参数，去掉该注解的话表单中传递的参数得与接受参数名称一致
         return cityService.findCityByName(cityName);
     }
+    
+    @RequestMapping(value = "/city/addCityInfo", method = RequestMethod.POST)
+    public Integer addCityInfo(@RequestBody City city) {
+        return cityService.addCityInfo(city);
+    }
 
 }
-
 ```
 
 <font color="#dd0000">6. @RequestBody</font>
 - 请求参数为json类型
 - 只能作用在post请求
-- 用来处理Content-Type为application/json,application/xml编码的内容<br/>
-```java
-@RestController
-public class CityRestController {
-
-    @Autowired
-    private CityService cityService;
-
-    @RequestMapping(value = "/city/addCityInfo", method = RequestMethod.POST)
-    public Integer addCityInfo(@RequestBody City city) {
-        return cityService.addCityInfo(city);
-    }
-}
-
-```
+- 用来处理Content-Type为application/json,application/xml编码的内容
 
 
 
