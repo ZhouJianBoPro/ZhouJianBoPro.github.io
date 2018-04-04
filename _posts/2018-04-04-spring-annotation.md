@@ -54,12 +54,17 @@ public class CityController {
 
 <font color="#dd0000">4. @PathVariable</font>
 - 用来处理映射 URL 绑定的占位符，可以将URL中绑定的变量通过该注解绑定到操作方法的入参中
-```html
-    @RequestMapping("/testPathVariable/{id}")
-    public String testPathVariable(@PathVariable("id") Integer id)
-    {
-        System.out.println("testPathVariable:"+id);
-        return SUCCESS;
+```java
+    @RestController
+    public class CityRestController {
+        
+        @RequestMapping("/testPathVariable/{id}")
+        public String testPathVariable(@PathVariable("id") Integer id)
+        {
+            System.out.println("testPathVariable:"+id);
+            return SUCCESS;
+        }
+    
     }
 ```
 
@@ -67,23 +72,54 @@ public class CityController {
 - spring boot获取请求的参数：1.request.getParamter("paramName");2.用@RequestParam获取
 - 注解底层还是实现了request.getParamter()，常用于处理简单的数据类型
 - 用来处理Content-Type为application/x-www-form-urlencoded编码的内容，提交方式为get，post
-```html
+```java
+@RestController
+public class CityRestController {
+
+    /**
+     * spring之@RequestParam @RequestBody @PathVariable详解：request数据到handler method 参数数据的绑定所用到的注解及使用情形
+     * 1.@PathVariable：处理request uri使用;
+     * 2.@RequestParam：用来处理Content-Type为application/x-www-form-urlencoded编码的内容，提交方式为get，post
+     * 3.@RequestBody：用来处理Content-Type为application/json,application/xml编码的内容
+     */
+
+    @Autowired
+    private CityService cityService;
+
     @RequestMapping(value = "/city/findOneCity", method = RequestMethod.GET)
     public City findOneCity(@RequestParam(value = "cityname", required = true) String cityName) {
         //@RequestParam注解作用：表名表单中传递的参数，去掉该注解的话表单中传递的参数得与接受参数名称一致
         return cityService.findCityByName(cityName);
     }
+
+}
 ```
 
 <font color="#dd0000">6. @RequestBody</font>
 - 请求参数为json类型
 - 只能作用在post请求
 - 用来处理Content-Type为application/json,application/xml编码的内容
-```html
+```java
+@RestController
+public class CityRestController {
+
+    /**
+     * spring之@RequestParam @RequestBody @PathVariable详解：request数据到handler method 参数数据的绑定所用到的注解及使用情形
+     * 1.@PathVariable：处理request uri使用;
+     * 2.@RequestParam：用来处理Content-Type为application/x-www-form-urlencoded编码的内容，提交方式为get，post
+     * 3.@RequestBody：用来处理Content-Type为application/json,application/xml编码的内容
+     */
+
+    @Autowired
+    private CityService cityService;
+
     @RequestMapping(value = "/city/addCityInfo", method = RequestMethod.POST)
     public Integer addCityInfo(@RequestBody City city) {
         return cityService.addCityInfo(city);
     }
+
+}
+
 ```
 
 
