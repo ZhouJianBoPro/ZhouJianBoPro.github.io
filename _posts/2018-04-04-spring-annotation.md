@@ -98,13 +98,6 @@ public class CityRestController {
 @RestController
 public class CityRestController {
 
-    /**
-     * spring之@RequestParam @RequestBody @PathVariable详解：request数据到handler method 参数数据的绑定所用到的注解及使用情形
-     * 1.@PathVariable：处理request uri使用;
-     * 2.@RequestParam：用来处理Content-Type为application/x-www-form-urlencoded编码的内容，提交方式为get，post
-     * 3.@RequestBody：用来处理Content-Type为application/json,application/xml编码的内容
-     */
-
     @Autowired
     private CityService cityService;
 
