@@ -72,6 +72,7 @@ public class CityController {
 - spring boot获取请求的参数：1.request.getParamter("paramName");2.用@RequestParam获取
 - 注解底层还是实现了request.getParamter()，常用于处理简单的数据类型
 - 用来处理Content-Type为application/x-www-form-urlencoded编码的内容，提交方式为get，post
+
 ```java
 @RestController
 public class CityRestController {
