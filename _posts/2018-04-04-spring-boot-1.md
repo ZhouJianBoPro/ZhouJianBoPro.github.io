@@ -14,7 +14,7 @@ spring-boot应用中这些第三方库几乎可以零配置，开箱即用，
 不用开发人员按照固定的模板进行繁琐的配置。
 
 **spring注解**    
-http://boopro.cn/spring/2018/04/04/spring-annotation/
+[spring注解](http://boopro.cn/spring/2018/04/04/spring-annotation/)
 
 
 
