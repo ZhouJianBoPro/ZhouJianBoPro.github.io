@@ -13,8 +13,8 @@ spring-boot是用来简化spring应用的初始搭建及开发过程，
 spring-boot应用中这些第三方库几乎可以零配置，开箱即用，
 不用开发人员按照固定的模板进行繁琐的配置。
 
-**spring注解**    
-[spring注解](http://boopro.cn/spring/2018/04/04/spring-annotation/)
+**注解**    
+[spring 注解](http://boopro.cn/spring/2018/04/04/spring-annotation/)
 
 
 
