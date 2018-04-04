@@ -94,6 +94,7 @@ public class CityRestController {
 - 请求参数为json类型
 - 只能作用在post请求
 - 用来处理Content-Type为application/json,application/xml编码的内容
+
 ```java
 @RestController
 public class CityRestController {
@@ -105,7 +106,6 @@ public class CityRestController {
     public Integer addCityInfo(@RequestBody City city) {
         return cityService.addCityInfo(city);
     }
-
 }
 
 ```
