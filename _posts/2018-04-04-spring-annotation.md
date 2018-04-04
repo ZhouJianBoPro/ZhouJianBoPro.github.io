@@ -93,8 +93,7 @@ public class CityRestController {
 <font color="#dd0000">6. @RequestBody</font>
 - 请求参数为json类型
 - 只能作用在post请求
-- 用来处理Content-Type为application/json,application/xml编码的内容
-
+- 用来处理Content-Type为application/json,application/xml编码的内容<br/>
 ```java
 @RestController
 public class CityRestController {
