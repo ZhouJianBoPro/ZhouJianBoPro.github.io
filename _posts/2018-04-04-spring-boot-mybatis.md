@@ -11,6 +11,30 @@ description: spring-boot mybatis两种整合方式学习。
 - 映射文件（容易维护，sql都在xml文件中）
 - 注解
 
+```xml
+    <properties>
+        <mybatis-spring-boot>1.2.0</mybatis-spring-boot>
+        <mysql-connector>5.1.39</mysql-connector>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot Mybatis 依赖 -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybatis-spring-boot}</version>
+        </dependency>
+
+        <!-- MySQL 连接驱动依赖 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector}</version>
+        </dependency>
+      
+    </dependencies>
+```
+
 **映射文件方式**<br/>
 直接上代码：<br/>
 
