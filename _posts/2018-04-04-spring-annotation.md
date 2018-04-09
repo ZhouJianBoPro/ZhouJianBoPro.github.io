@@ -99,6 +99,9 @@ public class CityRestController {
 - 只能作用在post请求
 - 用来处理Content-Type为application/json,application/xml编码的内容
 
+<font color="#dd0000">7. @Autowired</font>
+- 自动帮你把bean里面引用(对象)的setter/getter方法省略，自动帮你set/get
+
 
 
 
