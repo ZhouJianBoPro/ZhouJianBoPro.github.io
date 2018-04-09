@@ -1,6 +1,6 @@
 ---
 layout: post
-title: spring-boot mybatis两种整合方式
+title: spring-boot mybatis整合
 date: 2018-04-09
 categories: spring
 tags: [spring-boot]
