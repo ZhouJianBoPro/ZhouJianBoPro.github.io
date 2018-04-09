@@ -23,4 +23,7 @@ spring-boot应用中这些第三方库几乎可以零配置，开箱即用，
 **spring-boot mybatis实现的两种方式**<br/>
 [spring-boot整合mybatis](http://boopro.cn/spring/2018/04/09/spring-boot-mybatis/)
 
+**spring-boot中redis的使用**<br/>
+[spring-boot中redis的使用](http://boopro.cn/spring/2018/04/09/spring-boot-redis/)
+
 
