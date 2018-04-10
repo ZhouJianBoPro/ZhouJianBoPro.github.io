@@ -7,7 +7,6 @@ tags: [spring-boot]
 description: spring-boot学习实践。
 ---
 
-**示例**<br/>
 [spring boot简单示例](https://github.com/jianvhen/spring-boot-learning-example)
 
 **spring-boot的好处**<br/>
@@ -20,13 +19,10 @@ spring-boot应用中这些第三方库几乎可以零配置，开箱即用，
 - 提供众多的'starter'，通过依赖探知自动配置，要做的是仅仅添加maven依赖
 - 无需生成代码及xml配置，内部集成了这些配置
 
-**注解**<br/>
-[spring 注解](http://boopro.cn/spring/2018/04/04/spring-annotation/)
+[spring注解](http://boopro.cn/spring/2018/04/04/spring-annotation/)
 
-**spring-boot mybatis实现的两种方式**<br/>
 [spring-boot整合mybatis](http://boopro.cn/spring/2018/04/09/spring-boot-mybatis/)
 
-**spring-boot中redis的使用**<br/>
 [spring-boot中redis的使用](http://boopro.cn/spring/2018/04/04/spring-boot-redis/)
 
 
