@@ -7,7 +7,7 @@ tags: [spring-boot]
 description: spring-boot学习实践。
 ---
 
-**示例**
+**示例**<br/>
 [spring boot简单示例](https://github.com/jianvhen/spring-boot-learning-example)
 
 **spring-boot的好处**<br/>
