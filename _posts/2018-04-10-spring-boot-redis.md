@@ -1,7 +1,7 @@
 ---
 layout: post
 title: spring-boot中redis的使用
-date: 2018-04-04
+date: 2018-04-10
 categories: spring
 tags: [spring-boot]
 description: spring-boot中redis的使用。
