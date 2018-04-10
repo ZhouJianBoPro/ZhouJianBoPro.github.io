@@ -7,6 +7,9 @@ tags: [spring-boot]
 description: spring-boot学习实践。
 ---
 
+**示例**
+[spring boot简单示例](https://github.com/jianvhen/spring-boot-learning-example)
+
 **spring-boot的好处**<br/>
 spring-boot是用来简化spring应用的创建、运行、调试、部署等出现的，无需过多关注xml的配置
 该框架集成了大量第三方库配置（例如Jackson、JDBC、Redis、mail等）；
