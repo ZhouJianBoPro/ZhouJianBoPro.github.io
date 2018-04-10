@@ -1,6 +1,6 @@
 ---
 layout: post
-title: spring依赖注入(DI)及控制反转(IOC)梳理
+title: spring依赖注入及控制反转
 date: 2018-04-04
 categories: spring
 tags: [spring]
