@@ -24,6 +24,7 @@ public interface DataFinder {
     void getData();
 }
 ```
+
 1.2、MysqlDataFinder实现：
 ```java
 public class MysqlDataFinder implements DataFinder{
@@ -34,6 +35,7 @@ public class MysqlDataFinder implements DataFinder{
     }
 }
 ```
+
 1.3、OracleDataFinder实现：
 ```java
 public class OracleDataFinder implements DataFinder{
@@ -44,6 +46,7 @@ public class OracleDataFinder implements DataFinder{
     }
 }
 ```
+
 
 <font color="#dd0000">2.传统编程实现：</font>
 ```java
@@ -82,6 +85,7 @@ public class Client {
 ```
 缺点：Example类依赖MysqlDataFinder和OracleDataFinder具体实现，耦合度较高；实际上Example不应该有这么多控制逻辑，
 只负责调用doStuff()即可，不需要关注DataFinder的类型，我们应该试着将调用DataFinder类型类型交给Client类。
+
 
 <font color="#dd0000">3.IOC实现：</font>
 ```java
