@@ -121,46 +121,70 @@ public class CityRestController {
 <font color="#dd0000">9. @Configuration和@Bean</font>
 - @Configuration相当于application-config.xml中的beans标签，用于标注类
 - @Bean相当于application-configs.xml中的bean标签，用于标注方法
+
+<font color="#dd0000">10. @Primary</font>
+- 常用于返回Bean的方法上，当该Bean有多个同类Bean时，优先选择该Bean
 ```html
-<beans> 
-        <bean id="orderService" class="com.acme.OrderService"/> 
-                <constructor-arg ref="orderRepository"/> 
-        </bean> 
-        <bean id="orderRepository" class="com.acme.OrderRepository"/> 
-                <constructor-arg ref="dataSource"/> 
-        </bean> 
-</beans> 
+    @Bean(name = "masterDataSource")
+    @Primary    //优先选择该bean而不选择下面的
+    public DataSource masterDataSource() {
+        DruidDataSource dataSource = new DruidDataSource();
+        dataSource.setDriverClassName(driverClass);
+        dataSource.setUrl(url);SqlSessionFactory
+        dataSource.setUsername(user);
+        dataSource.setPassword(password);
+        return dataSource;
+    }
+    
+    @Bean(name = "clusterDataSource")
+    public DataSource clusterDataSource() {
+        DruidDataSource dataSource = new DruidDataSource();
+        dataSource.setDriverClassName(driverClass);
+        dataSource.setUrl(url);
+        dataSource.setUsername(user);
+        dataSource.setPassword(password);
+        return dataSource;
+    }
 ```
-然后可以像这样使用bean了：
-```html
-ApplicationContext ctx = new ClassPathXmlApplicationContext("application-config.xml"); 
-OrderService orderService = (OrderService) ctx.getBean("orderService"); 
-```
-现在Spring Java Configuration这个项目提供了一种通过java代码来装配bean的方案：
+
+<font color="#dd0000">11. @Qualifier</font>
+- 当一个接口有多个实现类时，自动注入bean时区分具体Bean
 ```java
-@Configuration 
-public class ApplicationConfig { 
-   
-        public @Bean OrderService orderService() { 
-                return new OrderService(orderRepository()); 
-        } 
-   
-        public @Bean OrderRepository orderRepository() { 
-                return new OrderRepository(dataSource()); 
-        } 
-   
-        public @Bean DataSource dataSource() { 
-                // instantiate and return an new DataSource … 
-        } 
+//接口
+public interface EmployeeService {
+    public EmployeeDto getEmployeeById(Long id);
+}
+
+//实现类1
+@Service("service")
+public class EmployeeServiceImpl implements EmployeeService {
+    public EmployeeDto getEmployeeById(Long id) {
+        return new EmployeeDto();
+    }
+}
+
+//实现类2
+@Service("service1")
+public class EmployeeServiceImpl1 implements EmployeeService {
+    public EmployeeDto getEmployeeById(Long id) {
+        return new EmployeeDto();
+    }
+}
+
+@Controller
+@RequestMapping("/emplayee.do")
+public class EmployeeInfoControl {
+    
+    @Autowired
+    @Qualifier("service")   //标注实现类为EmployeeServiceImpl
+    EmployeeService employeeService;
+     
+    @RequestMapping(params = "method=showEmplayeeInfo")
+    public void showEmplayeeInfo(HttpServletRequest request, HttpServletResponse response, EmployeeDto dto) {
+        //...
+    }
 }
 ```
-bean获取方式二：
-```html
-ApplicationContext ctx = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-OrderService orderService = (OrderService)ctx.getBean("orderService");
-```
-
-
 
 
 
