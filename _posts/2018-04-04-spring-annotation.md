@@ -148,7 +148,7 @@ public class CityRestController {
 ```
 
 <font color="#dd0000">11. @Qualifier</font>
-- 当一个接口有多个实现类时，自动注入bean时区分具体Bean
+- 当一个接口有多个实现类时，自动注入bean时区分具体Bean<br/>
 ```java
 //接口
 public interface EmployeeService {
