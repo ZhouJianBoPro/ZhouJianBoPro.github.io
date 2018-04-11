@@ -102,6 +102,65 @@ public class CityRestController {
 <font color="#dd0000">7. @Autowired</font>
 - 自动帮你把bean里面引用(对象)的setter/getter方法省略，自动帮你set/get
 
+<font color="#dd0000">8. @Value</font>
+- 简化properties文件中配置的读取
+```html
+    @Value("${cluster.datasource.url}")
+    private String url;
+
+    @Value("${cluster.datasource.username}")
+    private String user;
+
+    @Value("${cluster.datasource.password}")
+    private String password;
+
+    @Value("${cluster.datasource.driverClassName}")
+    private String driverClass;
+```
+
+<font color="#dd0000">9. @Configuration和@Bean</font>
+- @Configuration相当于application-config.xml中的beans标签，用于标注类
+- @Bean相当于application-configs.xml中的bean标签，用于标注方法
+```html
+<beans> 
+        <bean id="orderService" class="com.acme.OrderService"/> 
+                <constructor-arg ref="orderRepository"/> 
+        </bean> 
+        <bean id="orderRepository" class="com.acme.OrderRepository"/> 
+                <constructor-arg ref="dataSource"/> 
+        </bean> 
+</beans> 
+```
+然后可以像这样使用bean了：
+```html
+ApplicationContext ctx = new ClassPathXmlApplicationContext("application-config.xml"); 
+OrderService orderService = (OrderService) ctx.getBean("orderService"); 
+```
+现在Spring Java Configuration这个项目提供了一种通过java代码来装配bean的方案：
+```java
+@Configuration 
+public class ApplicationConfig { 
+   
+        public @Bean OrderService orderService() { 
+                return new OrderService(orderRepository()); 
+        } 
+   
+        public @Bean OrderRepository orderRepository() { 
+                return new OrderRepository(dataSource()); 
+        } 
+   
+        public @Bean DataSource dataSource() { 
+                // instantiate and return an new DataSource … 
+        } 
+}
+```
+bean获取方式二：
+```html
+ApplicationContext ctx = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+OrderService orderService = (OrderService)ctx.getBean("orderService");
+```
+
+
 
 
 
