@@ -25,4 +25,4 @@ spring-boot应用中这些第三方库几乎可以零配置，开箱即用，
 
 [spring-boot中redis的使用](http://boopro.cn/spring/2018/04/10/spring-boot-redis/)
 
-
+[spring-boot多数据源配置](http://boopro.cn/spring/2018/04/16/spring-boot-mybatis-mutil-datasources/)
