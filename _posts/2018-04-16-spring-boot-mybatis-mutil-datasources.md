@@ -9,20 +9,20 @@ description: spring-boot中mybatis多数据源配置
 
 **配置文件**
 ```properties
-## master 数据源配置
+# master 数据源配置
 master.datasource.url=jdbc:mysql://116.62.57.144:3306/springbootdb?useUnicode=true&characterEncoding=utf8
 master.datasource.username=root
 master.datasource.password=w1239699756.
 master.datasource.driverClassName=com.mysql.jdbc.Driver
 
-## cluster 数据源配置
+# cluster 数据源配置
 cluster.datasource.url=jdbc:mysql://116.62.57.144:3306/springbootdb_cluster?useUnicode=true&characterEncoding=utf8
 cluster.datasource.username=root
 cluster.datasource.password=w1239699756.
 cluster.datasource.driverClassName=com.mysql.jdbc.Driver
 ```
 
-**数据源注册**</br>
+**数据源注册**
 > 最关键的地方就是这块了，一层一层注入,首先创建DataSource，然后创建SqlSessionFactory再创建事务。其中需要指定分库的mapper文件地址，以及分库dao层代码
 
 ```java
@@ -83,28 +83,29 @@ public class MasterDataSourceConfig {
 ```
 2.ClusterDataSourceConfig从数据源配置
 ```java
-@MapperScan(basePackages = MasterDataSourceConfig.PACKAGE, sqlSessionFactoryRef = "masterSqlSessionFactory")
-public class MasterDataSourceConfig {
+@Configuration
+// 扫描 Mapper 接口并容器管理
+@MapperScan(basePackages = ClusterDataSourceConfig.PACKAGE, sqlSessionFactoryRef = "clusterSqlSessionFactory")
+public class ClusterDataSourceConfig {
 
-    // 精确到 master 目录，以便跟其他数据源隔离
-    static final String PACKAGE = "org.spring.springboot.dao.master";
-    static final String MAPPER_LOCATION = "classpath:mapper/master/*.xml";
+    // 精确到 cluster 目录，以便跟其他数据源隔离
+    static final String PACKAGE = "org.spring.springboot.dao.cluster";
+    static final String MAPPER_LOCATION = "classpath:mapper/cluster/*.xml";
 
-    @Value("${master.datasource.url}")
+    @Value("${cluster.datasource.url}")
     private String url;
 
-    @Value("${master.datasource.username}")
+    @Value("${cluster.datasource.username}")
     private String user;
 
-    @Value("${master.datasource.password}")
+    @Value("${cluster.datasource.password}")
     private String password;
 
-    @Value("${master.datasource.driverClassName}")
+    @Value("${cluster.datasource.driverClassName}")
     private String driverClass;
 
-    @Bean(name = "masterDataSource")
-    @Primary
-    public DataSource masterDataSource() {
+    @Bean(name = "clusterDataSource")
+    public DataSource clusterDataSource() {
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setDriverClassName(driverClass);
         dataSource.setUrl(url);
@@ -113,20 +114,18 @@ public class MasterDataSourceConfig {
         return dataSource;
     }
 
-    @Bean(name = "masterTransactionManager")
-    @Primary
-    public DataSourceTransactionManager masterTransactionManager() {
-        return new DataSourceTransactionManager(masterDataSource());
+    @Bean(name = "clusterTransactionManager")
+    public DataSourceTransactionManager clusterTransactionManager() {
+        return new DataSourceTransactionManager(clusterDataSource());
     }
 
-    @Bean(name = "masterSqlSessionFactory")
-    @Primary
-    public SqlSessionFactory masterSqlSessionFactory(@Qualifier("masterDataSource") DataSource masterDataSource)
+    @Bean(name = "clusterSqlSessionFactory")
+    public SqlSessionFactory clusterSqlSessionFactory(@Qualifier("clusterDataSource") DataSource clusterDataSource)
             throws Exception {
         final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-        sessionFactory.setDataSource(masterDataSource);
+        sessionFactory.setDataSource(clusterDataSource);
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver()
-                .getResources(MasterDataSourceConfig.MAPPER_LOCATION));
+                .getResources(ClusterDataSourceConfig.MAPPER_LOCATION));
         return sessionFactory.getObject();
     }
 }
