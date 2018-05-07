@@ -111,6 +111,63 @@ public static void wrongReleaseLock2(Jedis jedis, String lockKey, String request
 ```
 
 <span id="database"><font color="#dd0000">基于数据库实现分布式锁</font><br /></span>
+1. 在数据库中增加一张锁表：当我们要锁住某个方法或资源时，我们就该在表中增加一条记录，想要释放锁的时候就删除这条记录，创建这样一张数据库表：
+```mysql
+CREATE TABLE `methodLock` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `method_name` varchar(64) NOT NULL DEFAULT '' COMMENT '锁定的方法名',
+  `desc` varchar(1024) NOT NULL DEFAULT '备注信息',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '保存数据时间，自动生成',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uidx_method_name` (`method_name `) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='锁定中的方法';
+```
+当我们要锁住某个方法时，执行以下SQL：
+```mysql
+insert into methodLock(method_name,desc) values ('method_name','desc')
+```
+因为我们对method_name做了唯一性约束，如果有多个请求同时提交到数据库中时，数据库会保证只有一个操作会成功，那么我们就可以认为操作成功的那个线程
+获得了该方法的锁，可以执行方法体内内容。<br/>
 
+当方法执行完之后，想要释放锁的话，可以执行以下sql：
+```mysql
+delete from methodLock where method_name ='method_name'
+```
+弊端：<br/>
+* 数据库锁强依赖于数据库的高可用性，数据库是一个单点，一旦数据库挂掉，会导致业务系统不可用
+* 这把锁没有失效时间，一旦解锁失败，会导致锁一直存在数据库中，其他线程无法再次获得锁
+
+解决方式：<br/>
+* 多个数据库数据同步，一旦挂掉切换至备库中
+* 没有失效时间？做一个定时任务，每隔一段时间把数据库中的锁清除掉
+
+2. 基于数据库的排它锁：<br/>
+我们还用刚刚创建的那张锁表，通过数据库的排它锁来实现分布式锁，。当某条记录被加上排它锁之后，其他线程无法获取到排它锁
+```html
+public boolean lock(){
+    connection.setAutoCommit(false)
+    while(true){
+        try{
+            result = select * from methodLock where method_name=xxx for update;
+            if(result==null){
+                return true;
+            }
+        }catch(Exception e){
+
+        }
+        sleep(1000);
+    }
+    return false;
+}
+```
+我们可以认为获取到排他锁的线程即获取到了分布式锁，处理完业务逻辑后再解锁：
+```html
+public void unlock(){
+    connection.commit();
+}
+```
 
 <span id="zookeeper"><font color="#dd0000">基于zookeeper实现分布式锁</font><br /></span>
+大致思路：每个客户端对某个方法进行加锁的时候，在zookeeper上的该方法对应指定的目录下，生成唯一的一个
+瞬时有序节点，判断是否获取锁的方式很简单，只需要判断有序节点中序号最小的一个，当释放锁的时候，
+只需将这个瞬时节点删除即可，可以避免服务宕机导致的锁无法释放，而产生死锁的问题。
