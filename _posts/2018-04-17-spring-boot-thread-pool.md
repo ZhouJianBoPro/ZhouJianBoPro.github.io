@@ -79,4 +79,45 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     ThreadPoolExecutor.CallerRunsPolicy：由调用线程处理该任务
     ```
     
-    
+**深入剖析线程池实现原理**
+1.线程池的状态：
+```html
+running状态：当创建线程池之后，线程池处于running状态；
+shutdown状态：如果调用了shutdown()，线程池处于shutdown状态，线程池不能接收新的任务，它会等待其他任务执行完；
+stop状态：如果调用了shutdownNow()，线程池处于stop状态，线程池不能接收新任务，而且正在执行的任务也会立即被终止
+terminated状态：当线程池处于shutdown或stop状态，并且所有的工作线程都已销毁，任务缓存队列已清空或执行完，线程池被设置为termitnated
+```
+2.任务的执行：
+- 首先判断任务是否为null，抛出NullpointException
+- 当poolSize <= corePoolSize时，每来一个任务就创建一个线程去执行
+- poolSize > corePoolSize时，将后续到来的任务放入缓存队列中，执行完任务的线程主动去缓存队列中取出任务执行，
+而不是重新开一个任务负责将队列中的任务分配给线程，降低了复杂度；添加失败一般是缓存队列已满。
+- 当poolSize = maximumPoolSize时，且缓存队列已满，会采取任务拒绝策略进行处理
+- 当corePoolSize < poolSize < maximumPoolSize时，空闲线程会在keepAliveTime后终止
+ 
+3.线程池中线程的初始化：
+- 默认情况下，线程池创建之后不会立即创建线程，只有当有任务到达后才会创建线程
+- prestartCoreThread():初始化一个核心线程
+- prestartAllCoreThreads():初始化所有核心线程
+
+4.任务缓存队列及排队策略<br/>
+任务缓存队列，即workQueue,用来存放等待执行的任务，workQueue的类型为BlockingQueue<Runnable>,通常可以去以下三种类型：
+- ArrayBlockingQueue:基于数组的先进先出队列，此队列创建需要指定大小
+- LinkedBlockingQueue:基于链表的先进先出队列，默认大小为Integer.maxValue()
+- synchronousQueue:不会保存提交的任务，直接创建一个线程来执行新任务
+
+5.任务拒绝策略<br/>
+当poolSize = maximumPoolSize且缓存队列已满，如果还有任务到达时会采取任务拒绝策略，通常有四种任务策略：
+```html
+ThreadPoolExecutor.AbortPolicy:丢弃任务并抛出RejectedExecutionException异常。
+ThreadPoolExecutor.DiscardPolicy：也是丢弃任务，但是不抛出异常。
+ThreadPoolExecutor.DiscardOldestPolicy：丢弃队列最前面的任务，然后重新尝试执行任务（重复此过程）
+ThreadPoolExecutor.CallerRunsPolicy：由调用线程处理该任务
+```
+6.线程池的关闭<br/>
+- shutdown():线程池处于shutdown状态，不会立即关闭线程池，会等待所有缓存队列中的任务执行完才关闭
+- shutdownNow():线程池处于stop状态，立即关闭线程池，尝试打断正在执行的任务，并且清空缓存队列，返回尚未执行的任务
+
+
+
+
