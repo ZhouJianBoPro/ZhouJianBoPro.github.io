@@ -54,9 +54,9 @@ public void set(T value) { }
 public void remove() { }
 ```
 2.线程创建副本过程：
-- Thread线程类中有ThreadLocal.ThreadLocalMap类型的成员变量threadLocals,键值为ThreadLocal,value值为
-变量副本（T变量）
-- 初始时，Thread中的threadLocals为空,当通过ThreadLocal调用get(),set()方法，就会对threadLocals变量
+1）Thread线程类中有ThreadLocal.ThreadLocalMap类型的成员变量threadLocals,键值为ThreadLocal,value值为
+变量副本（T变量）<br/>
+2）初始时，Thread中的threadLocals为空,当通过ThreadLocal调用get(),set()方法，就会对threadLocals变量
 进行初始化，并且以LocalThread为键值，副本变量为value
 
 ```java
