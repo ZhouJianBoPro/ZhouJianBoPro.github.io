@@ -58,6 +58,7 @@ public void remove() { }
 变量副本（T变量）
 - 初始时，Thread中的threadLocals为空,当通过ThreadLocal调用get(),set()方法，就会对threadLocals变量
 进行初始化，并且以LocalThread为键值，副本变量为value
+
 ```java
 public class ThreadLocalDemo {
 
