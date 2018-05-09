@@ -41,7 +41,7 @@ connect后没有被调用之前就被其他线程close连接，设置同步会�
 创建和关闭数据库连接，会导致服务器压力很大
 - 使用ThreadLocal在每个线程中创建connect变量副本，既保证了线程安全，也不会频繁的创建和销毁数据库连接对服务器造成很大的压力
 
-**深入了解ThreadLocal类**
+**深入了解ThreadLocal类**<br/>
 1.ThreadLocal提供的几个常用方法介绍：
 ```html
 //获取当前线程中副本变量
@@ -53,7 +53,7 @@ public void set(T value) { }
 //移除当前线程中的副本变量
 public void remove() { }
 ```
-2.线程创建副本过程：
+2.线程创建副本过程：<br/>
 1）Thread线程类中有ThreadLocal.ThreadLocalMap类型的成员变量threadLocals,键值为ThreadLocal,value值为
 变量副本（T变量）<br/>
 2）初始时，Thread中的threadLocals为空,当通过ThreadLocal调用get(),set()方法，就会对threadLocals变量
