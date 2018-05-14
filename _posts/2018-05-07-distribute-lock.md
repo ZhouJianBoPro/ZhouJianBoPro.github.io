@@ -2,8 +2,8 @@
 layout: post
 title: 分布式锁
 date: 2018-05-07
-categories: distribute
-tags: [distribute-lock]
+categories: high concurrency
+tags: [concurrency]
 description: 分布式锁实现的几种方式
 ---
 

@@ -2,8 +2,8 @@
 layout: post
 title: 原子操作Integer类
 date: 2018-05-08
-categories: atomicity
-tags: [AtomicInteger]
+categories: high concurrency
+tags: [concurrency]
 description: 并发操作Integer操作类
 ---
 

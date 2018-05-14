@@ -2,8 +2,8 @@
 layout: post
 title: ThreadLocal深入了解
 date: 2018-05-09
-categories: concurrency
-tags: [LocalThread]
+categories: high concurrency
+tags: [concurrency]
 description: java并发编程中ThreadLocal深入了解
 ---
 
