@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 深入了解单例模式
-date: 2018-03-16
+date: 2018-05-16
 categories: design patterns
 tags: [patterns]
 description: 深入了解单例模式
