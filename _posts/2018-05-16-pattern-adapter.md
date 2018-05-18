@@ -61,6 +61,7 @@ public class Client {
 ```
 
 - 对象适配器：接口多实现可以把多个适配者类适配到同一个目标
+![对象适配器](/images/obj_adapter.png)
 ```java
 //目标类
 public interface Target {
