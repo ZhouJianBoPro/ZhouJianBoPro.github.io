@@ -54,7 +54,7 @@ public class Singleton {
     }
 }
 ```
-3. 静态内部类法：将类的实例化放在静态内部类中，避免静态实例在Singleton类加载时就创建对象，实现了延时加载，
+3.静态内部类法：将类的实例化放在静态内部类中，避免静态实例在Singleton类加载时就创建对象，实现了延时加载，
 并且静态内部类只会加载一次，保证了线程安全
 ```java
 public class Singleton {
@@ -71,7 +71,7 @@ public class Singleton {
 }
 ```
 
-4. 枚举写法
+4.枚举写法
 ```java
 public enum Singleton {
     
