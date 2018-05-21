@@ -7,7 +7,7 @@ tags: [database]
 description: mysql表连接查询
 ---
 
-**常见的四种连接查询方式**
+**常见的五种连接查询方式**
 - 内连接（inner join on）
 - 左外连接[左连接]（left outer join on）
 - 右外连接[右连接]（right outer join on）
