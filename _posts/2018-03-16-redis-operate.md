@@ -26,6 +26,7 @@ description: redis对数据类型的操作。
 **list类型**
 - lpush：一般将对象转换成字符串存入
 - lrang：通过下标取出
+
 ```html
 jedis.lpush(key, new Gson().toJson(object));
 jedis.expire(key, EXPIRE_SECONDS);
