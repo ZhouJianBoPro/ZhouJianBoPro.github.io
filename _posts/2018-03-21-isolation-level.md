@@ -16,10 +16,10 @@ description: 深入分析事物的隔离级别。
 <font color="#dd0000">脏读：A事物读取了B事物未提交更改的数据：</font>
 ![脏读示例](/images/dirtyRead.png)
 
-<font color="#0000dd">不可重复读：A事物读取了B事物已提交更改的数据：</font>
+<font color="#0000dd">不可重复读：A事物读取了B事物已提交更改的数据，造成两次出现数据不一致</font>
 ![不可重复读示例](/images/unrepeatableRead.png)
 
-<font color="#660066">幻读：A事物读取了B事物已提交新增的数据：</font>
+<font color="#660066">幻读：A事物读取了B事物已提交新增或删除的数据：</font>
 ![幻读示例](/images/fantasyRead.png)
 
 
@@ -36,7 +36,7 @@ select @@global.tx_isolation;
 |隔离级别/读数据一致性及允许的并发副作用|脏读|不可重复读|幻读|
 |---|---|---|---|---|
 |未提交读(read uncommited)|允许|允许|允许|
-|已提交读(read commited)|脏读|允许|允许|
+|已提交读(read commited)|禁止|允许|允许|
 |可重复读(repeatable read)|禁止|禁止|允许|
 |可序列化(serializable)|禁止|禁止|禁止|
 
