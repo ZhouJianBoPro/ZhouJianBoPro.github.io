@@ -29,7 +29,7 @@ description: 分布式系统简单了解
   
 **分布式session处理机制**
 
-[分布式session处理机制](http://boopro.cn/%E5%88%86%E5%B8%83%E5%BC%8F/2018/03/27/distributed-session/)
+[分布式session处理机制](http://boopro.cn/distributed/environment/2018/03/27/distributed-session/)
 
 
 
