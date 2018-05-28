@@ -11,6 +11,27 @@ description: spring依赖注入及控制反转概念梳理。
 1. 依赖注入是控制反转实现的一种方式，将实例变量传入到一个对象中去
 2. spring核心就是依赖注入，spring支持的注入方式：setter注入、构造器注入
 
+setter注入：
+```xml
+<bean id="people" class="com.abc.People">
+　　 <property name="name" value="张三" /> <!-- 设值注入 -->
+　　 <property name="school" ref="school" /> <!-- 设值注入 -->
+　　 <property name="age" value="20" type="int" />
+</bean>
+<bean id="school" class="com.abc.School" />
+```
+
+构造器注入：
+```xml
+<bean id="people" class="com.abc.People">
+    <!-- 构造注入，index=0表示构造器的第一个参数 -->
+　　 <constructor-arg index="0" value="张三"/> 
+　　 <constructor-arg index="1" ref="school" /> <!-- 构造注入 -->
+　　 <constructor-arg index="2" value="20" type="int" />
+</bean>
+<bean id="school" class="com.abc.School" />
+```
+
 **IOC是什么**
 1. IOC是一种思想，将你设计好的对象交给IOC容器控制，而不是在对象内部通过new主动去创建对象
 2. IOC容器控制对象的创建，同时控制了外部对象的获取
