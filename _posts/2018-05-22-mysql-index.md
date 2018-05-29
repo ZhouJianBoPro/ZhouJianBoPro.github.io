@@ -12,7 +12,7 @@ description: mysql索引
 - 在数据插入及修改时效率较低（索引需要存储在mysql中）
 
 **建表时添加索引**
-```html
+```sql
 CREATE TABLE T_USER (
   'id' int(10) not null auto_increment comment '主键',
   'user_name' VARCHAR (20) not null comment '用户名',
@@ -21,7 +21,7 @@ CREATE TABLE T_USER (
   index(user_name) #创建单索引
 );
 ```
-```html
+```sql
    CREATE TABLE T_USER (
      'id' int(10) not null auto_increment comment '主键',
      'user_name' VARCHAR (20) not null comment '用户名',
@@ -30,7 +30,7 @@ CREATE TABLE T_USER (
      UNIQUE index index_userName(user_name) #创建唯一索引
    );
    ```
-   ```html
+   ```sql
    CREATE TABLE T_USER (
      'id' int(10) not null auto_increment comment '主键',
      'user_name' VARCHAR (20) not null comment '用户名',
