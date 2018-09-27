@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 深入了解session及cookie
+title: session-cookie
 date: 2018-03-30
 categories: basic
 tags: [basic]

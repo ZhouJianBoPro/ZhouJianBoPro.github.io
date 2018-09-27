@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 深入了解代理模式
+title: proxy-parttner
 date: 2018-05-17
 categories: design patterns
 tags: [patterns]

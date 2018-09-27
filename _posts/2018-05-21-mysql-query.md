@@ -1,6 +1,6 @@
 ---
 layout: post
-title: mysql表连接查询
+title: join-query
 date: 2018-05-21
 categories: database
 tags: [database]

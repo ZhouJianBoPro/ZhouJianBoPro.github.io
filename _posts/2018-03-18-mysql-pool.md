@@ -1,10 +1,10 @@
 ---
 layout: post
-title: c3p0数据库连接池
+title: datebase-pool
 date: 2018-03-18
 categories: database
 tags: [database]
-description: c3p0数据库连接池
+description: 数据库连接池
 ---
 
 **传统模式下的JDBC数据库连接池**<br/>

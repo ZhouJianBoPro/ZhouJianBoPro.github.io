@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 分布式系统简单了解
+title: distributed-system 
 date: 2018-03-26
 categories: distributed environment
 tags: [distributed]

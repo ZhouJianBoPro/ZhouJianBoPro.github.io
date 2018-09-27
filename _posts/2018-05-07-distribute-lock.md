@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 分布式锁
+title: distributed-lock
 date: 2018-05-07
 categories: high concurrency
 tags: [concurrency]

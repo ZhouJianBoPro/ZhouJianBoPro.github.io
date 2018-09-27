@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 了解MySQL行级共享锁与排它锁
+title: mysql-lock
 date: 2018-03-21
 categories: high concurrency
 tags: [concurrency]

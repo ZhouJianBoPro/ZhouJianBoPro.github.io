@@ -1,9 +1,9 @@
 ---
 layout: post
-title: 深入了解spring注解
+title: spring-annotation
 date: 2018-04-04
 categories: spring
-tags: [spring-boot]
+tags: [spring]
 description: 深入了解spring注解。
 ---
 

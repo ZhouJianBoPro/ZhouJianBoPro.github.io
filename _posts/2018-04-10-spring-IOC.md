@@ -1,6 +1,6 @@
 ---
 layout: post
-title: spring依赖注入及控制反转
+title: spring-ioc
 date: 2018-04-10
 categories: spring
 tags: [spring]

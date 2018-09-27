@@ -3,7 +3,7 @@ layout: post
 title: spring-boot
 date: 2018-04-04
 categories: spring
-tags: [spring-boot]
+tags: [spring]
 description: spring-boot学习实践。
 ---
 

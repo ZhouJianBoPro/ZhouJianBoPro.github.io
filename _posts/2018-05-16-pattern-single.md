@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 深入了解单例模式
+title: singleton-pattern 
 date: 2018-05-16
 categories: design patterns
 tags: [patterns]

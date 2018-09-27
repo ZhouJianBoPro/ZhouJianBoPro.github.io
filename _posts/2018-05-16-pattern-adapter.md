@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 深入了解适配器模式
+title: adapter-parttner
 date: 2018-05-16
 categories: design patterns
 tags: [patterns]

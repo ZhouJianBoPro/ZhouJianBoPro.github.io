@@ -1,6 +1,6 @@
 ---
 layout: post
-title: ThreadLocal深入了解
+title: ThreadLocal
 date: 2018-05-09
 categories: high concurrency
 tags: [concurrency]

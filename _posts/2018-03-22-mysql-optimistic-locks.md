@@ -1,6 +1,6 @@
 ---
 layout: post
-title: mysql乐观锁学习总结
+title: optimistic-lock
 date: 2018-03-22
 categories: high concurrency
 tags: [concurrency]
