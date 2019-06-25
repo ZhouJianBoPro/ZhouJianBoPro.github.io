@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 分布式环境下session处理机制
+title: distributed-session
 date: 2018-03-27
 categories: distributed environment
 tags: [distributed]

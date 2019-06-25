@@ -1,6 +1,6 @@
 ---
 layout: post
-title: dubbo-admin管理平台搭建
+title: dubbo-admin
 date: 2018-04-02
 categories: linux
 tags: [linux]

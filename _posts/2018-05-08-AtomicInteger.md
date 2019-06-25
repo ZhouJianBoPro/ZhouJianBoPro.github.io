@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 原子操作Integer类
+title: atomic-operator
 date: 2018-05-08
 categories: high concurrency
 tags: [concurrency]

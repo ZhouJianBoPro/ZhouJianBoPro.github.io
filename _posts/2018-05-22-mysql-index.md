@@ -1,6 +1,6 @@
 ---
 layout: post
-title: mysql索引
+title: index
 date: 2018-05-22
 categories: database
 tags: [database]

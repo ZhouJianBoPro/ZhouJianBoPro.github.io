@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 线程池实现多线程
+title: thread-pool
 date: 2018-04-17
 categories: thread
 tags: [thread]

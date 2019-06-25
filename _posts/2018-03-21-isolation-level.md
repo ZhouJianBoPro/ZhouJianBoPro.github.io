@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 深入了解事物的隔离级别
+title: transaction
 date: 2018-03-16
 categories: high concurrency
 tags: [concurrency]
@@ -39,45 +39,6 @@ select @@global.tx_isolation;
 |已提交读(read commited)|禁止|允许|允许|
 |可重复读(repeatable read)|禁止|禁止|允许|
 |可序列化(serializable)|禁止|禁止|禁止|
-
-**JDBC事物实战**
-
-```$xslt
-public class TransactionLevels extends BaseJDBC {
-    public static void main(String[] args) {
-        try {
-            // 加载数据库驱动
-            Class.forName(DRIVER);
-            // 数据库连接
-            Connection conn = DriverManager.getConnection(URL,USER,PWD);
-            // 数据库元数据
-            DatabaseMetaData metaData = conn.getMetaData();
- 
-            // 是否支持事务
-            boolean isSupport = metaData.supportsTransactions();
-            System.out.println(isSupport);
-            // 是否支持的事务
-            boolean isSupportLevel = metaData.supportsTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE);
-            System.out.println(isSupportLevel);
-            // 获取默认事务
-            int defaultIsolation = metaData.getDefaultTransactionIsolation();
-            System.out.println(defaultIsolation);
- 
-            /** 关闭数据库连接 */
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
- 
-    }
-}
-```
 
 
     
