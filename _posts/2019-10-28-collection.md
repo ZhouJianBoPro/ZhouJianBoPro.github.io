@@ -1,7 +1,7 @@
 ---
 layout: post
 title: basic
-date: 2018-05-08
+date: 2019-10-28
 categories: collection
 tags: [collection]
 description: Java中的集合
