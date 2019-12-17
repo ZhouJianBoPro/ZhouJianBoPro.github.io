@@ -1,9 +1,8 @@
 ---
 layout: post
-title: mysql-lock
+title: MySQL行级锁
 date: 2018-03-21
-categories: high concurrency
-tags: [concurrency]
+tags: [SQL]
 description: 深入了解MySQL行级共享、排它锁。
 ---
 
@@ -15,16 +14,16 @@ description: 深入了解MySQL行级共享、排它锁。
 >如果事物T对数据A加上了共享锁后，则其他事物只能对数据A再加共享锁，不能加排他锁，获准共享锁的事物只能读数据，不能修改数据。
 
 用法：
-```$xslt
+```mysql
 SELECT ... LOCK IN SHARE MODE;
 ```
 在查询语句中增加LOCK INSHARE MODE，mysql会对查询结果中的每行都加共享锁，当没有其他线程对查询结果集中的任何一行使用排他锁时，可以成功申请共享锁，否则会被阻塞。
 
 **排它锁(exclusion lock)**
-> 排它锁也成写锁，如果事物T对数据A加上排它锁，则其他事物不能对数据A加任何类型的锁，获准排它锁的事物既能修改数据也能读数据。
+> 排它锁也成写锁，如果事物T对数据A加上排它锁，则其他事物不能对数据A加任何类型的锁，获准排它锁的事物既能修改数据也能读数据，其他事物对该数据有读权限
 
 用法：
-```$xslt
+```mysql
 SELECT ... FOR UPDATE;
 ```
 在查询语句后面增加FOR UPDATE，Mysql会对查询结果中的每行都加排他锁，当没有其他线程对查询结果集中的任何一行使用排他锁时，可以成功申请排他锁，否则会被阻塞。
