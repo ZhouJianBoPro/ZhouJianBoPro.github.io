@@ -1,9 +1,8 @@
 ---
 layout: post
 title: transaction
-date: 2018-03-16
-categories: high concurrency
-tags: [concurrency]
+date: 2018-03-21
+tags: [java]
 description: 深入分析事物的隔离级别。
 ---
 **事物的ACID特性简称：**
