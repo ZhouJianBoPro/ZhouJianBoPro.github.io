@@ -1,9 +1,8 @@
 ---
 layout: post
-title: distributed-lock
+title: 分布式锁的实现方式
 date: 2018-05-07
-categories: high concurrency
-tags: [concurrency]
+tags: [java]
 description: 分布式锁实现的几种方式
 ---
 

@@ -1,9 +1,8 @@
 ---
 layout: post
-title: atomic-operator
+title: AcomicInteger原子操作类
 date: 2018-05-08
-categories: high concurrency
-tags: [concurrency]
+tags: [java]
 description: 并发操作Integer操作类
 ---
 
