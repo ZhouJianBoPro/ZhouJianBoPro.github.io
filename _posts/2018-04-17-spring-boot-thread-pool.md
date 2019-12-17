@@ -1,13 +1,10 @@
 ---
 layout: post
-title: thread-pool
+title: ThreadPoolExecutor线程池
 date: 2018-04-17
-categories: thread
-tags: [thread]
-description: java线程池实现多线程
+tags: [java]
+description: ThreadPoolExecutor线程池
 ---
-
-[深入了解多线程](http://boopro.cn/thread/2018/03/16/thread/)
 
 **传统实现与线程池之间的区别**
 1. 传统实现需要线程的时候就去创建线程，如果并发线程数量较多时，频繁的创建和销毁线程需要时间，会大大降低系统的性能。
