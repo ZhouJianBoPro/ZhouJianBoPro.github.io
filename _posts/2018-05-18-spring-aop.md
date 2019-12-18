@@ -1,9 +1,8 @@
 ---
 layout: post
-title: aop
+title: AOP
 date: 2018-05-18
-categories: spring
-tags: [spring]
+tags: [java]
 description: spring面向切面编程
 ---
 

@@ -1,9 +1,8 @@
 ---
 layout: post
-title: singleton-pattern 
+title: 单例模式 
 date: 2018-05-16
-categories: design patterns
-tags: [patterns]
+tags: [designMode]
 description: 深入了解单例模式
 ---
 

@@ -1,8 +1,7 @@
 ---
 layout: post
-title: spring transaction
+title: Spring事物
 date: 2019-11-11
-categories: spring transaction
 tags: [spring transaction]
 description: spring事物管理
 ---

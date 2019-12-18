@@ -2,8 +2,7 @@
 layout: post
 title: Exception
 date: 2019-10-28
-categories: Exception
-tags: [Exception]
+tags: [java]
 description: try catch finally中的执行顺序
 ---
 

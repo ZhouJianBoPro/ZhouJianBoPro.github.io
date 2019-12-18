@@ -1,9 +1,8 @@
 ---
 layout: post
-title: proxy-parttner
+title: 代理模式
 date: 2018-05-17
-categories: design patterns
-tags: [patterns]
+tags: [designMode]
 description: 深入了解代理模式
 ---
 

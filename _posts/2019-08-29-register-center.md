@@ -1,9 +1,8 @@
 ---
 layout: post
-title: register center
+title: 注册中心
 date: 2018-08-29
-categories: register center
-tags: [register center]
+tags: [register]
 description: 注册中心
 ---
 
