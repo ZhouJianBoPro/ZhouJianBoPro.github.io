@@ -2,7 +2,7 @@
 layout: post
 title: Spring事物
 date: 2019-11-11
-tags: [spring transaction]
+tags: [Spring]
 description: spring事物管理
 ---
 

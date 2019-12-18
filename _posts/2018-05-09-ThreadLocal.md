@@ -2,7 +2,7 @@
 layout: post
 title: ThreadLocal
 date: 2018-05-09
-tags: [Java]
+tags: [java]
 description: java并发编程中ThreadLocal深入了解
 ---
 
