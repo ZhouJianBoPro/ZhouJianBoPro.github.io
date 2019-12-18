@@ -1,6 +1,6 @@
 ---
 layout: post
-title: AcomicInteger原子操作类
+title: AtomicInteger原子操作类
 date: 2018-05-08
 tags: [java]
 description: 并发操作Integer操作类
