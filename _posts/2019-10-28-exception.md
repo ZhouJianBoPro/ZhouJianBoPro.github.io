@@ -1,9 +1,8 @@
 ---
 layout: post
-title: Exception
+title: 异常块执行顺序
 date: 2019-10-28
-tags: [java]
-description: try catch finally中的执行顺序
+tags: [Java基础]
 ---
 
 1. 无异常无返回值时先执行try中的逻辑后执行finally中的逻辑

@@ -2,8 +2,7 @@
 layout: post
 title: AOP
 date: 2018-05-18
-tags: [Spring]
-description: spring面向切面编程
+tags: [Spring基础]
 ---
 
 **aop存在的价值**

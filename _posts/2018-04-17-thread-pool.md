@@ -2,8 +2,7 @@
 layout: post
 title: ThreadPoolExecutor线程池
 date: 2018-04-17
-tags: [java]
-description: ThreadPoolExecutor线程池
+tags: [线程池]
 ---
 
 **传统实现与线程池之间的区别**

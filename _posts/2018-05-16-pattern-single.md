@@ -2,8 +2,7 @@
 layout: post
 title: 单例模式 
 date: 2018-05-16
-tags: [designMode]
-description: 深入了解单例模式
+tags: [设计模式]
 ---
 
 **单例模式的优缺点**

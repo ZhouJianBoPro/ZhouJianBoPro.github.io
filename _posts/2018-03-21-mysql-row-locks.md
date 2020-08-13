@@ -1,9 +1,8 @@
 ---
 layout: post
-title: MySQL行级锁
+title: mysql行级锁
 date: 2018-03-21
-tags: [SQL]
-description: 深入了解MySQL行级共享、排它锁。
+tags: [锁]
 ---
 
 **描述**

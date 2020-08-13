@@ -2,8 +2,7 @@
 layout: post
 title: 代理模式
 date: 2018-05-17
-tags: [designMode]
-description: 深入了解代理模式
+tags: [设计模式]
 ---
 
 **代理模式的优点**

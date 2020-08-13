@@ -2,8 +2,7 @@
 layout: post
 title: 分布式锁的实现方式
 date: 2018-05-07
-tags: [java]
-description: 分布式锁实现的几种方式
+tags: [锁]
 ---
 
 **分布式疼点**

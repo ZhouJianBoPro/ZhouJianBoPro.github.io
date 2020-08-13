@@ -1,9 +1,8 @@
 ---
 layout: post
-title: Spring事务
+title: Spring事务管理
 date: 2019-11-11
-tags: [Spring]
-description: spring事务管理
+tags: [Spring基础]
 ---
 
 **事务的特性**
