@@ -1,0 +1,60 @@
+---
+layout: post
+title: 线程死锁
+date: 2021-08-01
+tags: [并发编程]
+---
+
+**死锁示例**
+
+```java
+public class DeadLockDemo {
+    
+    private static String A = "A";
+    
+    private static String B = "B";
+    
+    public static void main(String[] args) {
+        deadLock();
+    }
+    
+    private static void deadLock() {
+        
+        Thread t1 = new Thread(() -> {
+            synchronized (A) {
+                try {
+                    Thread.currentThread().sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (B) {
+                    System.out.println("1");
+                }
+            }
+        });
+        
+        Thread t2 = new Thread(() -> {
+            synchronized (B) {
+                synchronized (A) {
+                    System.out.println("2");
+                }
+            }
+        });
+        
+        t1.start();
+        t2.start();
+    }
+}
+```
+
+**产生死锁原因**
+
+```html
+线程之间竞争多个资源，其中一线程抢占到，比如t1线程抢占到A资源，t2线程抢占到B资源，此时t1线程想去抢占B资源，t2线程未释放B资源，t2线程去抢占A资源，t1线程未释放A资源;；此时造成t1、t2线程无法都处于资源获取状态无法释放自身获得的锁导致死锁
+```
+
+**避免死锁的方法**
+
+- 避免一个线程获取多个锁
+- 避免一个线程在获取到锁后尝试占用其他资源
+- 尝试使用定时锁Lock.tryLock(timeout)来代替内部锁

@@ -2,7 +2,7 @@
 layout: post
 title: List及Set集合
 date: 2019-10-28
-tags: [Collection集合]
+tags: [collection集合]
 ---
 
 **Collection包含List和Set**
