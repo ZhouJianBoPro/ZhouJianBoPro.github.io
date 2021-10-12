@@ -2,7 +2,7 @@
 layout: post
 title: 分布式锁的实现方式
 date: 2018-05-07
-tags: [锁]
+tags: [分布式锁]
 ---
 
 **分布式疼点**
