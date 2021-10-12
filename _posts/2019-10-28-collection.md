@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Java集合
+title: List及Set集合
 date: 2019-10-28
-tags: [Java基础]
+tags: [Collection集合]
 ---
 
 **Collection包含List和Set**

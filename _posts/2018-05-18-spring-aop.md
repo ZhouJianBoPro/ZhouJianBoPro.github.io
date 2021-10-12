@@ -1,8 +1,8 @@
 ---
 layout: post
-title: AOP
+title: spring aop
 date: 2018-05-18
-tags: [Spring基础]
+tags: [spring技术]
 ---
 
 **aop存在的价值**

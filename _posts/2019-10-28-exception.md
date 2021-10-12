@@ -2,7 +2,7 @@
 layout: post
 title: 异常块执行顺序
 date: 2019-10-28
-tags: [Java基础]
+tags: [其他]
 ---
 
 1. 无异常无返回值时先执行try中的逻辑后执行finally中的逻辑
