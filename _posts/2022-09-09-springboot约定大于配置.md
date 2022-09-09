@@ -1,6 +1,6 @@
 ---
 layout: post
-title: springboot基础
+title: springboot约定大于配置
 date: 2022-09-09
 tags: [springboot]
 ---
