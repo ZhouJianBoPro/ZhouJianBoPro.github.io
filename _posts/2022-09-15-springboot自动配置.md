@@ -14,65 +14,65 @@ tags: [springboot]
 
 #### 自动配置实现(mybatis为例)
 - pom.xml中增加mybatis自动配置依赖
-```xml
-<dependency>
-    <groupId>org.mybatis.spring.boot</groupId>
-    <artifactId>mybatis-spring-boot-autoconfigure</artifactId>
-    <version>1.3.2</version>
-</dependency>
-```
+    ```xml
+    <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-autoconfigure</artifactId>
+        <version>1.3.2</version>
+    </dependency>
+    ```
 - application.yml配置mybatis相关属性
-```properties
-mybatis.mapper-locations=classpath*:mybatis/mapper/*.xml
-```
+    ```properties
+    mybatis.mapper-locations=classpath*:mybatis/mapper/*.xml
+    ```
 - mybatis自动配置依赖对应jar包中/META-INF/spring.factories中配置文件
-```properties
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
-```
+    ```properties
+    # Auto Configure
+    org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
+    ```
 - 自动配置类MybatisAutoConfiguration
-```java
-@org.springframework.context.annotation.Configuration
-@ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
-@ConditionalOnBean(DataSource.class)
-/*配置类，与配置文件绑定*/
-@EnableConfigurationProperties(MybatisProperties.class)
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
-public class MybatisAutoConfiguration {
-
-  private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
-
-  private final MybatisProperties properties;
-
-  private final Interceptor[] interceptors;
-
-  private final ResourceLoader resourceLoader;
-
-  private final DatabaseIdProvider databaseIdProvider;
-
-  private final List<ConfigurationCustomizer> configurationCustomizers;
-}
-```
+    ```java
+    @org.springframework.context.annotation.Configuration
+    @ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
+    @ConditionalOnBean(DataSource.class)
+    /*配置类，与配置文件绑定*/
+    @EnableConfigurationProperties(MybatisProperties.class)
+    @AutoConfigureAfter(DataSourceAutoConfiguration.class)
+    public class MybatisAutoConfiguration {
+    
+      private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
+    
+      private final MybatisProperties properties;
+    
+      private final Interceptor[] interceptors;
+    
+      private final ResourceLoader resourceLoader;
+    
+      private final DatabaseIdProvider databaseIdProvider;
+    
+      private final List<ConfigurationCustomizer> configurationCustomizers;
+    }
+    ```
 - 配置类MybatisProperties
-```java
-@ConfigurationProperties(prefix = MybatisProperties.MYBATIS_PREFIX)
-public class MybatisProperties {
-
-  public static final String MYBATIS_PREFIX = "mybatis";
-
-  /**
-   * Locations of MyBatis mapper files.
-   */
-  private String[] mapperLocations;
-
-  public String[] getMapperLocations() {
-    return this.mapperLocations;
-  }
-
-  public void setMapperLocations(String[] mapperLocations) {
-    this.mapperLocations = mapperLocations;
-  }
-}
-```
+    ```java
+    @ConfigurationProperties(prefix = MybatisProperties.MYBATIS_PREFIX)
+    public class MybatisProperties {
+    
+      public static final String MYBATIS_PREFIX = "mybatis";
+    
+      /**
+       * Locations of MyBatis mapper files.
+       */
+      private String[] mapperLocations;
+    
+      public String[] getMapperLocations() {
+        return this.mapperLocations;
+      }
+    
+      public void setMapperLocations(String[] mapperLocations) {
+        this.mapperLocations = mapperLocations;
+      }
+    }
+    ```
 
