@@ -39,12 +39,12 @@ springboot用于简化spring应用的搭建，使用特定的方式进行配置�
 )
 public @interface SpringBootApplication {}
 ```
-1. @SpringBootConfiguration：是springboot对@Configuration的封装，作用等同于@Configuration，标明这是个配置类
-2. @EnableAutoConfiguration：自动配置注解，也可以关闭某个自动配置的选项，比如关闭数据源的自动配置
-    ```java
-    @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-    ```
-3. @ComponentScan：定义的扫描路径，把符合规则的类装配到spring容器中，这些类将被spring管理
-    ```java
-    @SpringBootApplication(scanBasePackages = {"cn.com.tsfa.fpm.persist", "cn.com.tsfa.batch", "cn.com.tsfa.fpm.api"})
-    ```
+- @SpringBootConfiguration：是springboot对@Configuration的封装，作用等同于@Configuration，标明这是个配置类
+- @EnableAutoConfiguration：自动配置注解，也可以关闭某个自动配置的选项，比如关闭数据源的自动配置
+```java
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+```
+- @ComponentScan：定义的扫描路径，把符合规则的类装配到spring容器中，这些类将被spring管理
+```java
+@SpringBootApplication(scanBasePackages = {"cn.com.tsfa.fpm.persist", "cn.com.tsfa.batch"})
+```
