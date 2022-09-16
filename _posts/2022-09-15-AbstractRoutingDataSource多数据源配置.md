@@ -187,12 +187,11 @@ tags: [spring]
     ```java
     /**
      * 数据源类型枚举，用作存储数据源信息的key
-     **/
+    **/
     public enum DataSourceEnum {
         DATASOURCE1, DATASOURCE2;
     }
-    ```
-    ```java
+  
     /**
      * 数据源类型管理
      **/
