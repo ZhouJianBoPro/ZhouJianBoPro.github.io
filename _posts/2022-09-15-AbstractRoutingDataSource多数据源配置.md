@@ -55,24 +55,24 @@ tags: [spring]
     ```
 - determineTargetDataSource方法返回当前需要使用到的数据源DataSource。方法中调用抽象方法determineCurrentLookUpKey获取
 目标数据源的key，然后通过key获取到对应的数据源
-```java
-public abstract class AbstractRoutingDataSource extends AbstractDataSource implements InitializingBean {
-        
-        protected abstract Object determineCurrentLookUpKey();
-
-        protected DataSource determineTargetDataSource() {
-            Assert.notNull(this.resolvedDataSources, "DataSource router not initialized");
-            //获取当前需要使用数据源的key
-            Object lookupKey = determineCurrentLookupKey();
-            //通过key获取对应的DataSource
-            DataSource dataSource = this.resolvedDataSources.get(lookupKey);
-            if (dataSource == null && (this.lenientFallback || lookupKey == null)) {
-                dataSource = this.resolvedDefaultDataSource;
+    ```java
+    public abstract class AbstractRoutingDataSource extends AbstractDataSource implements InitializingBean {
+            
+            protected abstract Object determineCurrentLookUpKey();
+    
+            protected DataSource determineTargetDataSource() {
+                Assert.notNull(this.resolvedDataSources, "DataSource router not initialized");
+                //获取当前需要使用数据源的key
+                Object lookupKey = determineCurrentLookupKey();
+                //通过key获取对应的DataSource
+                DataSource dataSource = this.resolvedDataSources.get(lookupKey);
+                if (dataSource == null && (this.lenientFallback || lookupKey == null)) {
+                    dataSource = this.resolvedDefaultDataSource;
+                }
+                if (dataSource == null) {
+                    throw new IllegalStateException("Cannot determine target DataSource for lookup key [" + lookupKey + "]");
+                }
+                return dataSource;
             }
-            if (dataSource == null) {
-                throw new IllegalStateException("Cannot determine target DataSource for lookup key [" + lookupKey + "]");
-            }
-            return dataSource;
-        }
-}
-```
+    }
+    ```
