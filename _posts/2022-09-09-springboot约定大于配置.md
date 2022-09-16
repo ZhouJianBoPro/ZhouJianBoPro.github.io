@@ -40,7 +40,7 @@ springboot用于简化spring应用的搭建，使用特定的方式进行配置�
 public @interface SpringBootApplication {}
 ```
 - @SpringBootConfiguration：是springboot对@Configuration的封装，作用等同于@Configuration，标明这是个配置类
-- @EnableAutoConfiguration：自动配置注解，也可以关闭某个自动配置的选项，比如关闭数据源的自动配置
+- @EnableAutoConfiguration：自动配置注解，也可以关闭某个自动配置的选项，比如多数据源场景下需要关闭数据源的自动配置
 ```java
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 ```
