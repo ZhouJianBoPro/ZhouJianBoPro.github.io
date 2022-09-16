@@ -185,16 +185,12 @@ tags: [spring]
     ```
 - 写一个数据源类型管理类，使用ThreadLocal共享线程变量，保证线程安全
     ```java
-    /**
-     * 数据源类型枚举，用作存储数据源信息的key
-    **/
+    //数据源类型枚举，用作存储数据源信息的key
     public enum DataSourceEnum {
         DATASOURCE1, DATASOURCE2;
     }
   
-    /**
-     * 数据源类型管理
-     **/
+    //数据源类型管理
     public class DataSourceTypeManager {
     
         private static final ThreadLocal<DataSourceEnum> dataSourceTypes = new ThreadLocal<DataSourceEnum>() {
