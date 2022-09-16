@@ -77,7 +77,7 @@ tags: [spring]
     }
     ```
 #### 多数据源实现示例
-1. JavaConfig方式配置DataSource1与DataSource2
+- JavaConfig方式配置DataSource1与DataSource2
     ```java
     @Configuration
     public class DataSourceConfigure {
@@ -183,7 +183,7 @@ tags: [spring]
     druid.maxPoolPreparedStatementPerConnectionSize=20
     druid.filters=stat
     ```
-2. 写一个数据源类型管理类，使用ThreadLocal共享线程变量，保证线程安全
+- 写一个数据源类型管理类，使用ThreadLocal共享线程变量，保证线程安全
     ```java
     /**
      * 数据源类型枚举，用作存储数据源信息的key
@@ -215,7 +215,7 @@ tags: [spring]
         }
     }
     ```
-3. 写一个ThreadLocalRoutingDataSource类，该类继承AbstractRoutingDataSource，并实现determineCurrentLookUpKey方法。
+- 写一个ThreadLocalRoutingDataSource类，该类继承AbstractRoutingDataSource，并实现determineCurrentLookUpKey方法。
 该类的作用是获取当前需要使用的数据源key
     ```java
     public class ThreadLocalRoutingDataSource extends AbstractRoutingDataSource {
@@ -227,7 +227,7 @@ tags: [spring]
     
     }
     ```
-4. 配置多个数据源及其事务、mybatis扫描的包
+- 配置多个数据源及其事务、mybatis扫描的包
     ```java
     @EnableTransactionManagement
     @Configuration
@@ -284,7 +284,7 @@ tags: [spring]
         }
     }
     ```
-5. 以AOP方式配置数据源拦截器，当执行到某些特定的方法，需要切换数据源去执行。默认使用DataSource1， 
+- 以AOP方式配置数据源拦截器，当执行到某些特定的方法，需要切换数据源去执行。默认使用DataSource1， 
 在其他数据源执行完成之后或执行时出现异常，需要自动切换到默认数据源
     ```java
     @Aspect
