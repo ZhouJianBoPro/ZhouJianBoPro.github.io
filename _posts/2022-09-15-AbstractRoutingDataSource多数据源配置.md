@@ -239,21 +239,21 @@ tags: [spring]
         }
     
         @Bean(name = "multiDataSource")
-        public ThreadLocalRountingDataSource multiDataSource(@Qualifier("dataSource1") DruidDataSource dataSource1,
+        public ThreadLocalRoutingDataSource multiDataSource(@Qualifier("dataSource1") DruidDataSource dataSource1,
                                                              @Qualifier("dataSource2") DruidDataSource dataSource2) {
     
-            ThreadLocalRountingDataSource threadLocalRountingDataSource = new ThreadLocalRountingDataSource();
-            threadLocalRountingDataSource.setDefaultTargetDataSource(dataSource1);
+            ThreadLocalRoutingDataSource threadLocalRoutingDataSource = new ThreadLocalRoutingDataSource();
+            threadLocalRoutingDataSource.setDefaultTargetDataSource(dataSource1);
     
             Map<Object, Object> targetDataSources = Maps.newHashMap();
             targetDataSources.put(DataSourceEnum.DATASOURCE1, dataSource1);
             targetDataSources.put(DataSourceEnum.DATASOURCE2, dataSource2);
-            threadLocalRountingDataSource.setTargetDataSources(targetDataSources);
-            return threadLocalRountingDataSource;
+            ThreadLocalRoutingDataSource.setTargetDataSources(targetDataSources);
+            return threadLocalRoutingDataSource;
         }
     
         @Bean(name = "bizTransactionManager")
-        public DataSourceTransactionManager bizTransactionManager(ThreadLocalRountingDataSource multiDataSource) {
+        public DataSourceTransactionManager bizTransactionManager(ThreadLocalRoutingDataSource multiDataSource) {
     
             DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
             transactionManager.setDataSource(multiDataSource);
@@ -261,7 +261,7 @@ tags: [spring]
         }
     
         @Bean(name = "bizSqlSessionFactory")
-        public SqlSessionFactoryBean bizSqlSessionFactory(ThreadLocalRountingDataSource multiDataSource) throws IOException {
+        public SqlSessionFactoryBean bizSqlSessionFactory(ThreadLocalRoutingDataSource multiDataSource) throws IOException {
     
             SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
             sqlSessionFactory.setDataSource(multiDataSource);
