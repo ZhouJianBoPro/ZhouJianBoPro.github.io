@@ -2,7 +2,7 @@
 layout: post
 title: ThreadLocal原理
 date: 2022-09-19
-tags: [并发编程]
+tags: [concurrency]
 ---
 
 #### ThreadLocal特性
