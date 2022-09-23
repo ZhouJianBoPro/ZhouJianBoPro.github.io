@@ -9,7 +9,6 @@ tags: [thread]
 使用线程池可以减少线程的创建及销毁的次数，使得线程池内的线程可以复用
 1. 无需每次创建新的线程，提升了系统响应速度
 2. 减少了线程创建及销毁时的系统资源占用
-3. 线程池内维护了最大的线程数，不能无限制的创建线程，保证系统稳定性
 
 #### 线程池的工作流程图
 ![线程池工作流程图](/images/threadpool.png)
@@ -101,8 +100,8 @@ public abstract class AbstractExecutorService implements ExecutorService {
 Executors.newCachedThreadPool()方式创建线程池使用到SynchronousQueue阻塞队列
 - LinkedBlockingQueue（无界阻塞队列）
 >基于链表的阻塞队列，该阻塞队列容量默认为Integer.MAX，因此也称之为无界阻塞队列。当线程池内线程数达到corePoolSize时，
-新任务到达后，放入该队列进行等待执行。由于该队列是无界的（不存在队列已满的情况），因此maximumPoolSize配置的值将无效。
-Executors.newFixedThreadPool()，Executors.newSingleThreadExecutor()方式创建的线程池使用到LinkedBlockingQueue阻塞队列
+新任务到达后，放入该队列进行等待执行。由于该队列是无界的（不存在队列已满的情况），因此按corePollSize = maximumPoolSize配置即可，
+同时也不会存在空闲线程销毁的场景。Executors.newFixedThreadPool()，Executors.newSingleThreadExecutor()方式创建的线程池使用到LinkedBlockingQueue阻塞队列
 - ArrayBlockingQueue（有界阻塞队列）
 >基于数组的阻塞队列，需要设置队列的初始容量。当线程池内的线程数达到corePoolSize时，新到达的任务会放入该队列中。
 当该队列容量已满时，且池内线程数不超过maximumPoolSize，此时会创建新线程来执行任务，否则会对任务作拒绝处理。
