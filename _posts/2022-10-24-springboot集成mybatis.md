@@ -83,6 +83,10 @@ spring:
 > mybatis的spring启动器依赖了mybatis、spring-mybatis、及自动配置器mybatis-spring-boot-autoconfigure
 
 #### mybatis-spring-boot-autoconfigure自动装配
+```properties
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
+```
 > 自动装配器包的META-INF目录中有一个spring.factories文件，根据springboot的spi机制，springboot会主动扫描spring.factories
-中配置的EnableAutoConfiguration的子类，并将该子类中通过JavaConfig方式配置的bean自动装配进spring容器
-
+中配置的EnableAutoConfiguration的子类，并将该子类中通过JavaConfig方式配置的bean自动装配到spring容器
