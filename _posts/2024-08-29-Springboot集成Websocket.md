@@ -142,7 +142,6 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 1. 问题：当服务端需要将消息广播给所有建立连接的客户端时，当前节点只能发送给与该节点建立连接的客户端，无法发送给其他节点的连接客户端
 2. 解决方案：使用redis发布订阅或消息队列，将消息广播给所有节点，然后由每个节点根据自身连接情况，选择是否将消息发送给客户端
 ```java
-
 /**
  * 使用redis发布订阅功能发布websocket消息
  * @param message
@@ -151,8 +150,7 @@ private void publishWebsocketMessage(String message) {
     RTopic rTopic = redissonClient.getTopic(RedisKeyConstant.TOPIC_WEBSOCKET);
     rTopic.publish(message);
 }
-```
-```java
+
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
 
