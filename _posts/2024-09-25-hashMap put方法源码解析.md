@@ -1,11 +1,11 @@
 ---
 layout: post
-title: PUT方法源码解析
+title: hashMap put方法源码解析
 date: 2024-09-25
-tags: [hashMap]
+tags: [Map]
 ---
 
-### PUT方法源码
+### put方法源码
 ```java
 public V put(K key, V value) {
         return putVal(hash(key), key, value, false, true);
@@ -89,7 +89,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 }
 ```
 
-### PUT方法执行过程
+### put方法执行过程
 1. 先计算元素键值的hash值，(h = key.hashCode()) ^ (h >>> 16) 
 2. 判断数组是否需要进行初始化，如果数组为空时，需要调用resize方法进行初始化
 3. 通过hash值计算出元素在数组中的下标，（n - 1）& hash
