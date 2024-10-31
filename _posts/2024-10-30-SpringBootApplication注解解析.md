@@ -80,7 +80,7 @@ public @interface SpringBootApplication {
 ```
 定义spring容器扫描路径，默认为当前类所在的包。@ComponentScan注解默认会排除掉一些类：
 1. 通过@Configuration注解标注的类，并且该类在spring.factories中的EnableAutoConfiguration属性对应values中存在。因为spring.factories中配置的类本身就会被spring注册，所以@Configuration注解的类不需要重复注册
-2. 自定义排除器，继承TypeExcludeFilter类并重写方法。需要注意的是，自定义的排除器需要在spring初始化器中注册，不能直接用@Component注解标记，涉及到bean的加载顺序会导致排除失效。
+2. 自定义排除器，继承TypeExcludeFilter类并重写方法。需要注意的是，自定义的排除器需要在spring初始化器中注册，不能直接用@Component注解标记，执行包路径扫描是在bean生命周期之前。
 ```java
 public class MyTypeExcludeFilter extends TypeExcludeFilter {
     @Override
