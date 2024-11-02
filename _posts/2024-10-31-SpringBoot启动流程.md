@@ -101,7 +101,7 @@ public ConfigurableApplicationContext run(String... args) {
         }
 }
 ```
-1. 获取SpringApplicationRunnerListener实例对象，默认只有一个EventPublishingRunListener（事件发布监听器）对象，它会在容器各个阶段发布对应的事件
+1. 从spring.factories中获取SpringApplicationRunListener实例对象，默认只有一个EventPublishingRunListener（事件发布监听器）对象，它会在容器各个阶段发布对应的事件
 2. 执行runnerListener.starting方法，发布应用开始启动的事件
 3. 加载环境的应用配置，包括系统属性，环境变量和应用配置文件
 4. 根据应用类型创建spring容器ConfigurableApplicationContext
