@@ -70,7 +70,7 @@ static WebApplicationType deduceFromClasspath() {
 1. 创建BootstrapContext（引导上下文），用于在应用启动前提供一些基础支持
 2. 从spring.factories中加载所有的应用启动监听器SpringApplicationRunListener（属于观察者模式中的被观察者），默认包含事件发布监听器（EventPublishingRunListener），用于在应用启动不同阶段发布对应的事件
 3. 发布应用启动事件
-4. 创建并准备环境
+4. [创建并准备环境](#prepareEnvironment)
 5. 打印banner
 6. 创建并准备应用上下文
 7. 
@@ -127,7 +127,7 @@ public ConfigurableApplicationContext run(String... args) {
 ```
 
 
-#### 环境准备过程
+#### 环境准备过程 {#prepareEnvironment}
 1. 创建Environment对象：根据应用类型创建相应的Environment实例对象，会包含环境变量属性源和Java系统属性源
 2. 配置Environment：加载默认属性和命令行参数
 3. 发布环境准备事件，被观察者（ConfigFileApplicationListener）订阅到事件后加载application.properties等配置文件
