@@ -1,7 +1,7 @@
 ---
 layout: post
-title: SpringBoot启动流程
-date: 2025-03-12
+title: SpringBoot启动流程及原理
+date: 2025-03-20
 tags: [springboot]
 ---
 
@@ -72,8 +72,8 @@ static WebApplicationType deduceFromClasspath() {
 3. 发布应用启动事件
 4. [创建并准备环境](#prepareEnvironment)
 5. 打印banner
-6. 创建并准备应用上下文
-7. 
+6. [创建并准备应用上下文](#prepareContext)
+
 ```java
 // 启动类中main方法中的args是用于接受命令行参数，命令行配置参数将会覆盖其他相同的配置
 public ConfigurableApplicationContext run(String... args) {
@@ -157,19 +157,19 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
     }
 ```
 
-#### SpringBoot 配置文件优先级规则（从低到高，后加载的配置会覆盖前面加载的配置）
+##### SpringBoot 配置文件优先级规则（从低到高，后加载的配置会覆盖前面加载的配置）
 1. 类路径根目录：classpath:/
 2. 类路径下的/conf目录：classpath:/conf/
 3. 当前目录：file:./
 4. 当前目录下的/conf目录：file:./conf/
 
-#### SpringBoot 配置优先级规则（从低到高）
+##### SpringBoot 配置优先级规则（从低到高）
 1. 默认属性：通过 SpringApplication.setDefaultProperties 设置的属性
 2. 配置文件：如application.properties
 3. 操作系统属性和Java系统属性
 4. 命令行参数
 
-#### 应用上下文准备过程
+#### 应用上下文准备过程 {#prepareContext}
 1. 对应用上下文进行扩展，也可自定义扩展点，如设置BeanNameGenerator
 2. 执行加载到的初始化器，初始化器是在SpringApplication实例化时从spring.factories文件中加载的
 3. 加载启动类，扫描包路径下@Component注解的类，并注册为Bean
