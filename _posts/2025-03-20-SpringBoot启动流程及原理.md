@@ -51,7 +51,6 @@ static WebApplicationType deduceFromClasspath() {
     } else {
         String[] var0 = SERVLET_INDICATOR_CLASSES;
         int var1 = var0.length;
-
         for(int var2 = 0; var2 < var1; ++var2) {
             String className = var0[var2];
             // 类路径中不存在javax.servlet.Servlet和org.springframework.web.context.ConfigurableWebApplicationContext
@@ -59,22 +58,21 @@ static WebApplicationType deduceFromClasspath() {
                 return NONE;
             }
         }
-
         // 默认为SERVLET
         return SERVLET;
     }
 }
 ```
 
+
 #### 运行 SpringApplication
 1. 创建BootstrapContext（引导上下文），用于在应用启动前提供一些基础支持
-2. 从spring.factories中加载所有的应用启动监听器SpringApplicationRunListener（属于观察者模式中的被观察者），默认包含事件发布监听器（EventPublishingRunListener），用于在应用启动不同阶段发布对应的事件
+2. 从spring.factories中加载所有的应用启动监听器SpringApplicationRunListener
 3. 发布应用启动事件
 4. [创建并准备环境](#prepareEnvironment)
 5. 打印banner
 6. [创建并准备应用上下文](#prepareContext)
 7. [刷新应用上下文](#refreshContext)
-
 ```java
 // 启动类中main方法中的args是用于接受命令行参数，命令行配置参数将会覆盖其他相同的配置
 public ConfigurableApplicationContext run(String... args) {
@@ -130,13 +128,14 @@ public ConfigurableApplicationContext run(String... args) {
 
 #### 环境准备过程 {#prepareEnvironment}
 1. 创建Environment对象：根据应用类型创建相应的Environment实例对象，会包含环境变量属性源和Java系统属性源
-2. 配置Environment：加载默认属性和命令行参数
-3. 发布环境准备事件，被观察者（ConfigFileApplicationListener）订阅到事件后加载application.properties等配置文件
+2. 配置Environment
+3. 发布环境准备事件
 4. 将SpringBoot配置源添加到Environment中
-
+5. 将默认配置属性源移到最后面
+6. spring.main配置绑定
 ```java
 private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners, DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
-        // 1. 创建Environment对象，会包含环境变量和Java系统属性
+        // 1. 创建Environment对象，根据应用类型创建相应的Environment实例对象，会包含环境变量属性源和Java系统属性源
         ConfigurableEnvironment environment = this.getOrCreateEnvironment();
         // 2. 配置Environment，先加载默认属性，然后再加载命令行参数
         this.configureEnvironment((ConfigurableEnvironment)environment, applicationArguments.getSourceArgs());
@@ -159,17 +158,20 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
     }
 ```
 
+
 ##### SpringBoot 配置文件优先级规则（从低到高，后加载的配置会覆盖前面加载的配置）
 1. 类路径根目录：classpath:/
 2. 类路径下的/conf目录：classpath:/conf/
 3. 当前目录：file:./
 4. 当前目录下的/conf目录：file:./conf/
 
+
 ##### SpringBoot 配置优先级规则（从低到高）
 1. 默认属性：通过 SpringApplication.setDefaultProperties 设置的属性
 2. 配置文件：如application.properties
 3. 操作系统属性和Java系统属性
 4. 命令行参数
+
 
 #### 应用上下文准备过程 {#prepareContext}
 1. 对应用上下文进行扩展，也可自定义扩展点，如设置BeanNameGenerator
@@ -179,7 +181,6 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
 5. 获取并配置BeanFactory，BeanFactory管理Bean的生命周期
 6. 加载启动类，并扫描@ComponentScan路径下的@Component注解的类，并注册为Bean
 7. 发布应用上下文刷新事件
-
 ```java
 private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context, ConfigurableEnvironment environment, SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
         context.setEnvironment(environment);
@@ -213,12 +214,10 @@ private void prepareContext(DefaultBootstrapContext bootstrapContext, Configurab
                 ((DefaultListableBeanFactory)beanFactory).setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
             }
         }
-
         // springboot默认为非懒加载方式加载bean，以便提前发现潜在的问题
         if (this.lazyInitialization) {
             context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
         }
-
         context.addBeanFactoryPostProcessor(new PropertySourceOrderingBeanFactoryPostProcessor(context));
         // source为启动类
         Set<Object> sources = this.getAllSources();
@@ -230,12 +229,13 @@ private void prepareContext(DefaultBootstrapContext bootstrapContext, Configurab
 }
 ```
 
-#### 应用上下文刷新过程 {#refreshContext}
-1. [准备刷新上下文](#prepareRefresh)，用于加载自定义属性源及校验非空属性配置
-2. 先获取准备应用上下文阶段配置的BeanFactory， 并且对BeanFactory进行进一步配置，注册一些默认的bean，如environment，以便在其他地方能够注入这些bean
-3. 执行[BeanFactory后置处理器](#BeanFactoryPostProcessor)，用于在BeanFactory配置完成后，Bean实例化前对BeanFactory进行自定义扩展，如忽略某些属性依赖注入或注册Bean
-4. 注册[Bean后置处理器](#BeanPostProcessor)
 
+
+#### 应用上下文刷新过程 {#refreshContext}
+1. [准备刷新上下文](#prepareRefresh)
+2. 获取并进一步配置BeanFactory
+3. 执行[BeanFactory后置处理器](#BeanFactoryPostProcessor)
+4. 注册[Bean后置处理器](#BeanPostProcessor)
 ```java
 public void refresh() throws BeansException, IllegalStateException {
         synchronized(this.startupShutdownMonitor) {
@@ -243,17 +243,17 @@ public void refresh() throws BeansException, IllegalStateException {
             StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
             // 1. 准备刷新上下文，用于加载自定义属性源及校验非空属性配置
             this.prepareRefresh();
-            // 2.1. 获取BeanFactory
+            // 2.1. 准备应用上下文阶段配置的BeanFactory
             ConfigurableListableBeanFactory beanFactory = this.obtainFreshBeanFactory();
-            // 2.2. 准备BeanFactory：1.BeanFactory在自动装配过程中会忽略一些属性依赖注入（如忽略ApplicationContextAware）；2.注册一些默认的bean（如environment）, 以便在其他地方能够依赖注入这些bean
+            // 2.2. 准备BeanFactory，对BeanFactory进行进一步配置：1.BeanFactory在自动装配过程中会忽略一些属性依赖注入（如忽略ApplicationContextAware）；2.注册一些默认的bean（如environment）, 以便在其他地方能够依赖注入这些bean
             this.prepareBeanFactory(beanFactory);
             try {
-                // 3.1 BeanFactory后置处理器，允许在BeanFactory配置完成后，但在Bean实例化前，对BeanFactory进行自定义配置或扩展。可以通过实现BeanFactoryPostProcessor接口并重写
+                // 3.1 BeanFactory后置处理器，允许在BeanFactory配置完成后，但在Bean实例化前，对BeanFactory进行自定义配置或扩展。可以通过实现BeanFactoryPostProcessor接口并重写postProcessBeanFactory方法
                 this.postProcessBeanFactory(beanFactory);
                 StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
                 // 3.2 执行BeanFactory后置处理器
                 this.invokeBeanFactoryPostProcessors(beanFactory);
-                // 5. 注册Bean后置处理器，用于bean实
+                // 5. 注册Bean后置处理器
                 this.registerBeanPostProcessors(beanFactory);
                 beanPostProcess.end();
                 this.initMessageSource();
@@ -276,6 +276,8 @@ public void refresh() throws BeansException, IllegalStateException {
         }
 }
 ```
+
+
 
 #### 准备刷新上下文 {#prepareRefresh}
 ```java
@@ -300,6 +302,8 @@ protected void prepareRefresh() {
 }
 ```
 
+
+
 #### BeanFactory后置处理器 {#BeanFactoryPostProcessor}
 ```java
 @Component
@@ -311,6 +315,7 @@ public class MyCustomBeanFactoryPostProcessor implements BeanFactoryPostProcesso
     }
 }
 ```
+
 
 #### Bean后置处理器 {#BeanPostProcessor}
 ```java
