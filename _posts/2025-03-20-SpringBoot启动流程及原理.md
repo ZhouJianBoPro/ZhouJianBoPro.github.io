@@ -66,8 +66,8 @@ static WebApplicationType deduceFromClasspath() {
 
 
 #### 运行 SpringApplication
-1. 创建BootstrapContext（引导上下文），用于在应用启动前提供一些基础支持
-2. 从spring.factories中加载所有的应用启动监听器SpringApplicationRunListener
+1. 创建BootstrapContext（引导上下文
+2. 加载应用启动监听器
 3. 发布应用启动事件
 4. [创建并准备环境](#prepareEnvironment)
 5. 打印banner
@@ -127,7 +127,7 @@ public ConfigurableApplicationContext run(String... args) {
 
 
 #### 环境准备过程 {#prepareEnvironment}
-1. 创建Environment对象：根据应用类型创建相应的Environment实例对象，会包含环境变量属性源和Java系统属性源
+1. 创建Environment对象
 2. 配置Environment
 3. 发布环境准备事件
 4. 将SpringBoot配置源添加到Environment中
@@ -174,17 +174,17 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
 
 
 #### 应用上下文准备过程 {#prepareContext}
-1. 对应用上下文进行扩展，也可自定义扩展点，如设置BeanNameGenerator
-2. 执行加载到的初始化器，初始化器是在SpringApplication实例化时从spring.factories文件中加载的
-3. 加载启动类，扫描包路径下@Component注解的类，并注册为Bean
-4. 发布应用上下文加载事件
-5. 获取并配置BeanFactory，BeanFactory管理Bean的生命周期
-6. 加载启动类，并扫描@ComponentScan路径下的@Component注解的类，并注册为Bean
+1. 应用上下文后置处理器
+2. 执行加载到的初始化器
+3. 发布上下文准备事件
+4. 关闭BootstrapContext
+5. 获取并配置BeanFactory
+6. 加载启动类
 7. 发布应用上下文刷新事件
 ```java
 private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context, ConfigurableEnvironment environment, SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
         context.setEnvironment(environment);
-        // 1. 对应用上下文进行自定义扩展，如自定义BeanNameGenerator，在创建SpringApplication对象中设置
+        // 1. 应用上下文后置处理器，对应用上下文进行自定义扩展，如自定义BeanNameGenerator，在创建SpringApplication对象中设置
         this.postProcessApplicationContext(context);
         // 2. 执行所有的初始化器，如ContextIdApplicationContextInitializer（为ApplicationContext设置一个唯一的上下文ID），ConfigurationWarningsApplicationContextInitializer（检测和报告配置可能出现的问题）等
         this.applyInitializers(context);
