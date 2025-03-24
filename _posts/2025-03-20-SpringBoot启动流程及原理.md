@@ -179,6 +179,7 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
 6. 加载启动类，并扫描@ComponentScan路径下的@Component注解的类，并注册为Bean
 7. 发布应用上下文刷新事件
 ```java
+
 private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context, ConfigurableEnvironment environment, SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
         context.setEnvironment(environment);
         // 1. 对应用上下文进行自定义扩展，如自定义BeanNameGenerator，在创建SpringApplication对象中设置
@@ -229,10 +230,11 @@ private void prepareContext(DefaultBootstrapContext bootstrapContext, Configurab
 ```
 
 #### 应用上下文刷新过程 {#refreshContext}
-1. 准备刷新上下文，用于加载自定义属性源及校验非空属性配置
+1. [准备刷新上下文](#prepareRefresh)，用于加载自定义属性源及校验非空属性配置
 2. 先获取准备应用上下文阶段配置的BeanFactory， 并且对BeanFactory进行进一步配置，注册一些默认的bean，如environment，以便在其他地方能够注入这些bean
 3. 执行[BeanFactory后置处理器](#BeanFactoryPostProcessor)，用于在BeanFactory配置完成后，Bean实例化前对BeanFactory进行自定义扩展，如忽略某些属性依赖注入或注册Bean
-4. 注册Bean后置处理器
+4. 注册[Bean后置处理器](#BeanPostProcessor)
+
 ```java
 public void refresh() throws BeansException, IllegalStateException {
         synchronized(this.startupShutdownMonitor) {
@@ -275,7 +277,10 @@ public void refresh() throws BeansException, IllegalStateException {
 
         }
 }
+```
 
+#### 准备刷新上下文 {#prepareRefresh}
+```java
 protected void prepareRefresh() {
     // 获取容器启动时间
     this.startupDate = System.currentTimeMillis();
@@ -309,4 +314,20 @@ public class MyCustomBeanFactoryPostProcessor implements BeanFactoryPostProcesso
 }
 ```
 
+#### Bean后置处理器 {#BeanPostProcessor}
+```java
+@Component
+public class MyCustomBeanPostProcessor implements BeanPostProcessor {
+
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("MyCustomBeanPostProcessor.postProcessBeforeInitialization()");
+        return bean;
+    }
+
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("MyCustomBeanPostProcessor.postProcessAfterInitialization()");
+        return bean;
+    }
+}
+```
 
