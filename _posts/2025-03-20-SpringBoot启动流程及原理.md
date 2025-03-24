@@ -133,6 +133,7 @@ public ConfigurableApplicationContext run(String... args) {
 2. 配置Environment：加载默认属性和命令行参数
 3. 发布环境准备事件，被观察者（ConfigFileApplicationListener）订阅到事件后加载application.properties等配置文件
 4. 将SpringBoot配置源添加到Environment中
+
 ```java
 private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners, DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
         // 1. 创建Environment对象，会包含环境变量和Java系统属性
@@ -178,8 +179,8 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
 5. 获取并配置BeanFactory，BeanFactory管理Bean的生命周期
 6. 加载启动类，并扫描@ComponentScan路径下的@Component注解的类，并注册为Bean
 7. 发布应用上下文刷新事件
-```java
 
+```java
 private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context, ConfigurableEnvironment environment, SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
         context.setEnvironment(environment);
         // 1. 对应用上下文进行自定义扩展，如自定义BeanNameGenerator，在创建SpringApplication对象中设置
@@ -246,14 +247,13 @@ public void refresh() throws BeansException, IllegalStateException {
             ConfigurableListableBeanFactory beanFactory = this.obtainFreshBeanFactory();
             // 2.2. 准备BeanFactory：1.BeanFactory在自动装配过程中会忽略一些属性依赖注入（如忽略ApplicationContextAware）；2.注册一些默认的bean（如environment）, 以便在其他地方能够依赖注入这些bean
             this.prepareBeanFactory(beanFactory);
-
             try {
                 // 3.1 BeanFactory后置处理器，允许在BeanFactory配置完成后，但在Bean实例化前，对BeanFactory进行自定义配置或扩展。可以通过实现BeanFactoryPostProcessor接口并重写
                 this.postProcessBeanFactory(beanFactory);
                 StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
                 // 3.2 执行BeanFactory后置处理器
                 this.invokeBeanFactoryPostProcessors(beanFactory);
-                // 5. 注册Bean后置处理器
+                // 5. 注册Bean后置处理器，用于bean实
                 this.registerBeanPostProcessors(beanFactory);
                 beanPostProcess.end();
                 this.initMessageSource();
@@ -266,7 +266,6 @@ public void refresh() throws BeansException, IllegalStateException {
                 if (this.logger.isWarnEnabled()) {
                     this.logger.warn("Exception encountered during context initialization - cancelling refresh attempt: " + var10);
                 }
-
                 this.destroyBeans();
                 this.cancelRefresh(var10);
                 throw var10;
@@ -274,7 +273,6 @@ public void refresh() throws BeansException, IllegalStateException {
                 this.resetCommonCaches();
                 contextRefresh.end();
             }
-
         }
 }
 ```
