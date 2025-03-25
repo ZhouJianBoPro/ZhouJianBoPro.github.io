@@ -64,9 +64,8 @@ static WebApplicationType deduceFromClasspath() {
 }
 ```
 
-
 #### 运行 SpringApplication
-1. 创建BootstrapContext（引导上下文
+1. 创建BootstrapContext（引导上下文）
 2. 加载应用启动监听器
 3. 发布应用启动事件
 4. [创建并准备环境](#prepareEnvironment)
@@ -125,7 +124,6 @@ public ConfigurableApplicationContext run(String... args) {
     }
 ```
 
-
 #### 环境准备过程 {#prepareEnvironment}
 1. 创建Environment对象
 2. 配置Environment
@@ -158,20 +156,17 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
     }
 ```
 
-
 ##### SpringBoot 配置文件优先级规则（从低到高，后加载的配置会覆盖前面加载的配置）
 1. 类路径根目录：classpath:/
 2. 类路径下的/conf目录：classpath:/conf/
 3. 当前目录：file:./
 4. 当前目录下的/conf目录：file:./conf/
 
-
 ##### SpringBoot 配置优先级规则（从低到高）
 1. 默认属性：通过 SpringApplication.setDefaultProperties 设置的属性
 2. 配置文件：如application.properties
 3. 操作系统属性和Java系统属性
 4. 命令行参数
-
 
 #### 应用上下文准备过程 {#prepareContext}
 1. 应用上下文后置处理器
@@ -229,8 +224,6 @@ private void prepareContext(DefaultBootstrapContext bootstrapContext, Configurab
 }
 ```
 
-
-
 #### 应用上下文刷新过程 {#refreshContext}
 1. [准备刷新上下文](#prepareRefresh)
 2. 获取并进一步配置BeanFactory
@@ -253,7 +246,7 @@ public void refresh() throws BeansException, IllegalStateException {
                 StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
                 // 3.2 执行BeanFactory后置处理器
                 this.invokeBeanFactoryPostProcessors(beanFactory);
-                // 5. 注册Bean后置处理器
+                // 4. 注册Bean后置处理器：从BeanFactory获取所有的实现了BeanPostProcessor的Bean定义，并注册到BeanFactory中。区分内部/外部处理器，而且外部处理器有顺序优先级
                 this.registerBeanPostProcessors(beanFactory);
                 beanPostProcess.end();
                 this.initMessageSource();
@@ -276,8 +269,6 @@ public void refresh() throws BeansException, IllegalStateException {
         }
 }
 ```
-
-
 
 #### 准备刷新上下文 {#prepareRefresh}
 ```java
@@ -302,8 +293,6 @@ protected void prepareRefresh() {
 }
 ```
 
-
-
 #### BeanFactory后置处理器 {#BeanFactoryPostProcessor}
 ```java
 @Component
@@ -316,9 +305,90 @@ public class MyCustomBeanFactoryPostProcessor implements BeanFactoryPostProcesso
 }
 ```
 
-
 #### Bean后置处理器 {#BeanPostProcessor}
+- 获取实现了BeanPostProcessor接口的Bean定义
+- Bean后置处理器分类：[内部处理器实现方式](#internalPostProcessor)，[外部处理器实现方式](#outBeanPostProcessor)
+- 优先级排序（外部处理器）：PriorityOrdered > Ordered > Non-Ordered
 ```java
+public static void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
+        // 1. 从BeanFactory中获取所有实现了BeanPostProcessor接口的Bean名称
+        String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
+        // 2.1 定义优先级最高的外部Bean后置处理器集合
+        List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList();
+        // 2.2 定义内部Bean后置处理器集合（优先级高于所有的外部处理器）
+        List<BeanPostProcessor> internalPostProcessors = new ArrayList();
+        // 2.3 定义实现了Ordered接口的外部处理器集合（优先级在外部处理器中第二）
+        List<String> orderedPostProcessorNames = new ArrayList();
+        // 2.3 定义没有实现Ordered接口的外部处理器集合（优先级最低）
+        List<String> nonOrderedPostProcessorNames = new ArrayList();
+        String[] var8 = postProcessorNames;
+        int var9 = postProcessorNames.length;
+
+        String ppName;
+        BeanPostProcessor pp;
+        for(int var10 = 0; var10 < var9; ++var10) {
+            ppName = var8[var10];
+            if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+                // 3.1 处理实现了 PriorityOrdered 接口的 BeanPostProcessor
+                pp = (BeanPostProcessor)beanFactory.getBean(ppName, BeanPostProcessor.class);
+                priorityOrderedPostProcessors.add(pp);
+                if (pp instanceof MergedBeanDefinitionPostProcessor) {
+                    internalPostProcessors.add(pp);
+                }
+            } else if (beanFactory.isTypeMatch(ppName, Ordered.class)) {
+                // 3.1 处理实现了 Ordered 接口的 BeanPostProcessor
+                orderedPostProcessorNames.add(ppName);
+            } else {
+                // 3.3 处理没有实现 Ordered 接口的 BeanPostProcessor
+                nonOrderedPostProcessorNames.add(ppName);
+            }
+        }
+
+        // 4. 首先注册优先级最高的外部Bean后缀处理器（按照getOrder中设置的值排序）
+        sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
+        registerBeanPostProcessors(beanFactory, (List)priorityOrderedPostProcessors);
+        
+        // 5. 然后注册实现了Ordered接口的Bean处理器，并且按照getOrder中设置的值排序
+        List<BeanPostProcessor> orderedPostProcessors = new ArrayList(orderedPostProcessorNames.size());
+        Iterator var14 = orderedPostProcessorNames.iterator();
+        while(var14.hasNext()) {
+            String ppName = (String)var14.next();
+            BeanPostProcessor pp = (BeanPostProcessor)beanFactory.getBean(ppName, BeanPostProcessor.class);
+            orderedPostProcessors.add(pp);
+            if (pp instanceof MergedBeanDefinitionPostProcessor) {
+                // 当处理器实现了MergedBeanDefinitionPostProcessor时，被认为内部处理器
+                internalPostProcessors.add(pp);
+            }
+        }
+        sortPostProcessors(orderedPostProcessors, beanFactory);
+        registerBeanPostProcessors(beanFactory, (List)orderedPostProcessors);
+
+        // 6. 注册优先级最低的Bean后置处理器
+        List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList(nonOrderedPostProcessorNames.size());
+        Iterator var17 = nonOrderedPostProcessorNames.iterator();
+        while(var17.hasNext()) {
+            ppName = (String)var17.next();
+            pp = (BeanPostProcessor)beanFactory.getBean(ppName, BeanPostProcessor.class);
+            nonOrderedPostProcessors.add(pp);
+            // 当处理器实现了MergedBeanDefinitionPostProcessor时，被认为内部处理器
+            if (pp instanceof MergedBeanDefinitionPostProcessor) {
+                internalPostProcessors.add(pp);
+            }
+        }
+        registerBeanPostProcessors(beanFactory, (List)nonOrderedPostProcessors);
+        
+        // 7. 注册内部Bean后置处理器
+        sortPostProcessors(internalPostProcessors, beanFactory);
+        registerBeanPostProcessors(beanFactory, (List)internalPostProcessors);
+        beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
+    }
+```
+
+#### 外部Bean后置处理器实现方式 {#outBeanPostProcessor}
+```java
+/**
+ * 只实现BeanPostProcessor接口，优先级最低
+ */
 @Component
 public class MyCustomBeanPostProcessor implements BeanPostProcessor {
 
@@ -330,6 +400,76 @@ public class MyCustomBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         System.out.println("MyCustomBeanPostProcessor.postProcessAfterInitialization()");
         return bean;
+    }
+}
+
+/**
+ * 分别实现BeanPostProcessor和Ordered，优先级比只实现BeanPostProcessor后置处理器要高。且重写了Ordered的getOrder方法，值越小，优先级越高
+ */
+@Component
+public class MyCustomOrderedBeanPostProcessor implements BeanPostProcessor, Ordered {
+
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("MyCustomOrderedBeanPostProcessor.postProcessBeforeInitialization()");
+        return bean;
+    }
+
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("MyCustomOrderedBeanPostProcessor.postProcessAfterInitialization()");
+        return bean;
+    }
+
+    /**
+     * 重写Ordered接口的getOrder方法，值越小，优先级越高
+     * @return
+     */
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+}
+
+/**
+ * 分别实现BeanPostProcessor和PriorityOrdered，优先级最高。且重写了Ordered的getOrder方法，值越小，优先级越高
+ */
+@Component
+public class MyCustomPriorityOrderedBeanPostProcessor implements BeanPostProcessor, PriorityOrdered {
+
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("MyCustomPriorityOrderedBeanPostProcessor.postProcessBeforeInitialization()");
+        return bean;
+    }
+
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("MyCustomPriorityOrderedBeanPostProcessor.postProcessAfterInitialization()");
+        return bean;
+    }
+
+    /**
+     * 重写Ordered接口的getOrder方法，值越小，优先级越高
+     * @return
+     */
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+}
+```
+
+
+#### 内部Bean后置处理器实现方式 {#internalPostProcessor}
+需要实现MergedBeanDefinitionPostProcessor接口，内部Bean后置处理器执行顺序在外部Bean后置处理器之前。并且支持更细粒度的操作，可以拿到RootBeanDefinition
+```java
+@Component
+public class MyCustomMergedBeanDefinitionPostProcessor implements MergedBeanDefinitionPostProcessor {
+    @Override
+    public void postProcessMergedBeanDefinition(RootBeanDefinition rootBeanDefinition, Class<?> aClass, String s) {
+        System.out.println("MyCustomMergedBeanDefinitionPostProcessor.postProcessMergedBeanDefinition");
+    }
+
+    @Override
+    public void resetBeanDefinition(String beanName) {
+        MergedBeanDefinitionPostProcessor.super.resetBeanDefinition(beanName);
     }
 }
 ```
