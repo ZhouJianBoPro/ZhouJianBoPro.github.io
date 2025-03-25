@@ -313,13 +313,13 @@ public class MyCustomBeanFactoryPostProcessor implements BeanFactoryPostProcesso
 public static void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
         // 1. 从BeanFactory中获取所有实现了BeanPostProcessor接口的Bean名称
         String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
-        // 2.1 定义优先级最高的外部Bean后置处理器集合
-        List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList();
-        // 2.2 定义内部Bean后置处理器集合（优先级高于所有的外部处理器）
+        // 2 定义内部Bean后置处理器集合（优先级高于所有的外部处理器）
         List<BeanPostProcessor> internalPostProcessors = new ArrayList();
-        // 2.3 定义实现了Ordered接口的外部处理器集合（优先级在外部处理器中第二）
+        // 3.1 定义优先级最高的外部Bean后置处理器集合
+        List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList();
+        // 3.2 定义实现了Ordered接口的外部处理器集合（优先级在外部处理器中第二）
         List<String> orderedPostProcessorNames = new ArrayList();
-        // 2.3 定义没有实现Ordered接口的外部处理器集合（优先级最低）
+        // 3.3 定义没有实现Ordered接口的外部处理器集合（优先级最低）
         List<String> nonOrderedPostProcessorNames = new ArrayList();
         String[] var8 = postProcessorNames;
         int var9 = postProcessorNames.length;
@@ -329,26 +329,26 @@ public static void registerBeanPostProcessors(ConfigurableListableBeanFactory be
         for(int var10 = 0; var10 < var9; ++var10) {
             ppName = var8[var10];
             if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
-                // 3.1 处理实现了 PriorityOrdered 接口的 BeanPostProcessor
+                // 4.1 处理实现了 PriorityOrdered 接口的 BeanPostProcessor
                 pp = (BeanPostProcessor)beanFactory.getBean(ppName, BeanPostProcessor.class);
                 priorityOrderedPostProcessors.add(pp);
                 if (pp instanceof MergedBeanDefinitionPostProcessor) {
                     internalPostProcessors.add(pp);
                 }
             } else if (beanFactory.isTypeMatch(ppName, Ordered.class)) {
-                // 3.1 处理实现了 Ordered 接口的 BeanPostProcessor
+                // 4.2 处理实现了 Ordered 接口的 BeanPostProcessor
                 orderedPostProcessorNames.add(ppName);
             } else {
-                // 3.3 处理没有实现 Ordered 接口的 BeanPostProcessor
+                // 4.3 处理没有实现 Ordered 接口的 BeanPostProcessor
                 nonOrderedPostProcessorNames.add(ppName);
             }
         }
 
-        // 4. 首先注册优先级最高的外部Bean后缀处理器（按照getOrder中设置的值排序）
+        // 5. 首先注册优先级最高的外部Bean后缀处理器（按照getOrder中设置的值排序）
         sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
         registerBeanPostProcessors(beanFactory, (List)priorityOrderedPostProcessors);
         
-        // 5. 然后注册实现了Ordered接口的Bean处理器，并且按照getOrder中设置的值排序
+        // 6. 然后注册实现了Ordered接口的Bean处理器，并且按照getOrder中设置的值排序
         List<BeanPostProcessor> orderedPostProcessors = new ArrayList(orderedPostProcessorNames.size());
         Iterator var14 = orderedPostProcessorNames.iterator();
         while(var14.hasNext()) {
@@ -363,7 +363,7 @@ public static void registerBeanPostProcessors(ConfigurableListableBeanFactory be
         sortPostProcessors(orderedPostProcessors, beanFactory);
         registerBeanPostProcessors(beanFactory, (List)orderedPostProcessors);
 
-        // 6. 注册优先级最低的Bean后置处理器
+        // 7. 注册优先级最低的Bean后置处理器
         List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList(nonOrderedPostProcessorNames.size());
         Iterator var17 = nonOrderedPostProcessorNames.iterator();
         while(var17.hasNext()) {
@@ -377,7 +377,7 @@ public static void registerBeanPostProcessors(ConfigurableListableBeanFactory be
         }
         registerBeanPostProcessors(beanFactory, (List)nonOrderedPostProcessors);
         
-        // 7. 注册内部Bean后置处理器
+        // 8. 注册内部Bean后置处理器
         sortPostProcessors(internalPostProcessors, beanFactory);
         registerBeanPostProcessors(beanFactory, (List)internalPostProcessors);
         beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
