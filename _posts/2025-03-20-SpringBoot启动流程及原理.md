@@ -229,6 +229,9 @@ private void prepareContext(DefaultBootstrapContext bootstrapContext, Configurab
 2. 获取并进一步配置BeanFactory
 3. 执行[BeanFactory后置处理器](#BeanFactoryPostProcessor)
 4. 注册[Bean后置处理器](#BeanPostProcessor)
+5. 初始化[事件广播器](#eventMulticaster)
+6. 注册事件监听器
+7. 完成[Bean的初始化](#finishBeanFactoryInitialization)
 ```java
 public void refresh() throws BeansException, IllegalStateException {
         synchronized(this.startupShutdownMonitor) {
@@ -249,10 +252,14 @@ public void refresh() throws BeansException, IllegalStateException {
                 // 4. 注册Bean后置处理器：从BeanFactory获取所有的实现了BeanPostProcessor的Bean定义，并注册到BeanFactory中。区分内部/外部处理器，而且外部处理器有顺序优先级
                 this.registerBeanPostProcessors(beanFactory);
                 beanPostProcess.end();
+                // MessageSource：用于处理国际化，多语言，多国语言等场景，默认使用ResourceBundleMessageSource
                 this.initMessageSource();
+                // 5. 初始化事件广播器。默认为SimpleApplicationEventMulticaster，用于广播事件，观察者模式实现事件广播和监听
                 this.initApplicationEventMulticaster();
                 this.onRefresh();
+                // 6. 注册事件监听器，事件监听器实现了ApplicationListener接口，用于监听事件广播器发送的事件
                 this.registerListeners();
+                // 7. 完成Bean的初始化，实例化所有非懒加载的Bean（会触发完整Bean的生命周期：实例化 -> 属性填充 -> BeanPostProcessor前置处理 -> 初始化方法 (@PostConstruct, InitializingBean) -> BeanPostProcessor后置处理）
                 this.finishBeanFactoryInitialization(beanFactory);
                 this.finishRefresh();
             } catch (BeansException var10) {
@@ -456,7 +463,6 @@ public class MyCustomPriorityOrderedBeanPostProcessor implements BeanPostProcess
 }
 ```
 
-
 #### 内部Bean后置处理器实现方式 {#internalPostProcessor}
 需要实现MergedBeanDefinitionPostProcessor接口，内部Bean后置处理器执行顺序在外部Bean后置处理器之前。并且支持更细粒度的操作，可以拿到RootBeanDefinition
 ```java
@@ -471,6 +477,138 @@ public class MyCustomMergedBeanDefinitionPostProcessor implements MergedBeanDefi
     public void resetBeanDefinition(String beanName) {
         MergedBeanDefinitionPostProcessor.super.resetBeanDefinition(beanName);
     }
+}
+```
+
+#### 事件广播器实现方式 {#eventMulticaster}
+1. 创建自定义事件
+    ```java
+    public class CustomApplicationEvent extends ApplicationEvent {
+    
+        private String message;
+    
+        public CustomApplicationEvent(Object source, String message) {
+            super(source);
+            this.message = message;
+        }
+    
+        public String getMessage() {
+            return message;
+        }
+    }
+    ```
+2. 创建事件监听器
+    ```java
+    @Component
+    public class MyCustomApplicationListener implements ApplicationListener<CustomApplicationEvent> {
+        @Override
+        public void onApplicationEvent(CustomApplicationEvent event) {
+            System.out.println("收到事件：" + event.getMessage());
+        }
+    }
+    ```
+3. 发布事件（ApplicationEventPublisher#publishEvent）
+    ```java
+    @Component
+    public class EventPublishService {
+    
+        @Autowired
+        private ApplicationEventPublisher applicationEventPublisher;
+    
+        public void publishEvent() {
+            applicationEventPublisher.publishEvent(new CustomApplicationEvent(this, "Hello, Spring event!"));
+        }
+    }
+    ```
+   
+#### 完成Bean初始化过程 {#finishBeanFactoryInitialization}
+简化流程：getBean() -> doGetBean() -> createBean() -> doCreateBean()，重点来分析doCreateBean方法
+```java
+protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException {
+        BeanWrapper instanceWrapper = null;
+        if (mbd.isSingleton()) {
+           // 某些情况下Bean定义可能发生变更，移除的目的是为了保证Bean实例是最新的
+            instanceWrapper = (BeanWrapper)this.factoryBeanInstanceCache.remove(beanName);
+        }
+
+        if (instanceWrapper == null) {
+            // 创建bean实例
+            instanceWrapper = this.createBeanInstance(beanName, mbd, args);
+        }
+
+        Object bean = instanceWrapper.getWrappedInstance();
+        Class<?> beanType = instanceWrapper.getWrappedClass();
+        if (beanType != NullBean.class) {
+            mbd.resolvedTargetType = beanType;
+        }
+
+        synchronized(mbd.postProcessingLock) {
+            if (!mbd.postProcessed) {
+                try {
+                    this.applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+                } catch (Throwable var17) {
+                    throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Post-processing of merged bean definition failed", var17);
+                }
+
+                mbd.postProcessed = true;
+            }
+        }
+
+        boolean earlySingletonExposure = mbd.isSingleton() && this.allowCircularReferences && this.isSingletonCurrentlyInCreation(beanName);
+        if (earlySingletonExposure) {
+            if (this.logger.isTraceEnabled()) {
+                this.logger.trace("Eagerly caching bean '" + beanName + "' to allow for resolving potential circular references");
+            }
+
+            this.addSingletonFactory(beanName, () -> {
+                return this.getEarlyBeanReference(beanName, mbd, bean);
+            });
+        }
+
+        Object exposedObject = bean;
+
+        try {
+            this.populateBean(beanName, mbd, instanceWrapper);
+            exposedObject = this.initializeBean(beanName, exposedObject, mbd);
+        } catch (Throwable var18) {
+            if (var18 instanceof BeanCreationException && beanName.equals(((BeanCreationException)var18).getBeanName())) {
+                throw (BeanCreationException)var18;
+            }
+
+            throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Initialization of bean failed", var18);
+        }
+
+        if (earlySingletonExposure) {
+            Object earlySingletonReference = this.getSingleton(beanName, false);
+            if (earlySingletonReference != null) {
+                if (exposedObject == bean) {
+                    exposedObject = earlySingletonReference;
+                } else if (!this.allowRawInjectionDespiteWrapping && this.hasDependentBean(beanName)) {
+                    String[] dependentBeans = this.getDependentBeans(beanName);
+                    Set<String> actualDependentBeans = new LinkedHashSet(dependentBeans.length);
+                    String[] var12 = dependentBeans;
+                    int var13 = dependentBeans.length;
+
+                    for(int var14 = 0; var14 < var13; ++var14) {
+                        String dependentBean = var12[var14];
+                        if (!this.removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+                            actualDependentBeans.add(dependentBean);
+                        }
+                    }
+
+                    if (!actualDependentBeans.isEmpty()) {
+                        throw new BeanCurrentlyInCreationException(beanName, "Bean with name '" + beanName + "' has been injected into other beans [" + StringUtils.collectionToCommaDelimitedString(actualDependentBeans) + "] in its raw version as part of a circular reference, but has eventually been wrapped. This means that said other beans do not use the final version of the bean. This is often the result of over-eager type matching - consider using 'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example.");
+                    }
+                }
+            }
+        }
+
+        try {
+            this.registerDisposableBeanIfNecessary(beanName, bean, mbd);
+            return exposedObject;
+        } catch (BeanDefinitionValidationException var16) {
+            throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Invalid destruction signature", var16);
+        }
 }
 ```
 
