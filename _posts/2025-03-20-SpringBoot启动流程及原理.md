@@ -523,6 +523,10 @@ public class MyCustomMergedBeanDefinitionPostProcessor implements MergedBeanDefi
    
 #### 完成Bean初始化过程 {#finishBeanFactoryInitialization}
 简化流程：getBean() -> doGetBean() -> createBean() -> doCreateBean()，重点来分析doCreateBean方法
+1. bean实例化
+2. 执行bean的内部处理器
+3. 将提前暴露bean的工厂方法放入到三级缓存中
+4. [bean属性填充](#populateBean)
 ```java
 protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException {
         BeanWrapper instanceWrapper = null;
@@ -532,7 +536,7 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
         }
 
         if (instanceWrapper == null) {
-            // 创建bean实例
+            // 1. 创建bean实例。默认情况下，spring容器会使用无参构造方法实例化。若没有无参构造方法，则会选择有参构造方法（有多个有参构造方法时需要指定使用哪个，可以通过@Autowired注解指定，否则spring不知道使用哪个会抛出异常）
             instanceWrapper = this.createBeanInstance(beanName, mbd, args);
         }
 
@@ -543,8 +547,10 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
         }
 
         synchronized(mbd.postProcessingLock) {
+            // 检查是否已经执行过Bean内部处理器
             if (!mbd.postProcessed) {
                 try {
+                    // 2. 执行Bean内部处理器
                     this.applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
                 } catch (Throwable var17) {
                     throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Post-processing of merged bean definition failed", var17);
@@ -554,12 +560,13 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
             }
         }
 
+        // 3. 允许循环情况下（spring.main.allow-circular-references: true），将正在创建的单例bean放入到三级缓存中，三级缓存是用于生成提前暴露bean的工厂方法（lambda表达式）
         boolean earlySingletonExposure = mbd.isSingleton() && this.allowCircularReferences && this.isSingletonCurrentlyInCreation(beanName);
         if (earlySingletonExposure) {
             if (this.logger.isTraceEnabled()) {
                 this.logger.trace("Eagerly caching bean '" + beanName + "' to allow for resolving potential circular references");
             }
-
+            
             this.addSingletonFactory(beanName, () -> {
                 return this.getEarlyBeanReference(beanName, mbd, bean);
             });
@@ -568,6 +575,7 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
         Object exposedObject = bean;
 
         try {
+            // 4. 属性填充
             this.populateBean(beanName, mbd, instanceWrapper);
             exposedObject = this.initializeBean(beanName, exposedObject, mbd);
         } catch (Throwable var18) {
@@ -611,4 +619,69 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
         }
 }
 ```
+
+#### bean属性填充过程 {#populateBean}
+1. 获取BeanDefinition定义的属性
+2. 获取bean自动装配方式
+```java
+protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
+
+      // 1. 获取BeanDefinition定义的属性
+      PropertyValues pvs = mbd.hasPropertyValues() ? mbd.getPropertyValues() : null;
+      // 2. 获取bean自动装配方式（@Bean）：0: 不进行自动装配，1:根据属性名自动装配，2:根据属性类型自动装配，3:根据构造函数自动装配
+      int resolvedAutowireMode = mbd.getResolvedAutowireMode();
+      if (resolvedAutowireMode == 1 || resolvedAutowireMode == 2) {
+         MutablePropertyValues newPvs = new MutablePropertyValues((PropertyValues)pvs);
+         if (resolvedAutowireMode == 1) {
+            this.autowireByName(beanName, mbd, bw, newPvs);
+         }
+
+         if (resolvedAutowireMode == 2) {
+            this.autowireByType(beanName, mbd, bw, newPvs);
+         }
+
+         pvs = newPvs;
+      }
+
+      boolean hasInstAwareBpps = this.hasInstantiationAwareBeanPostProcessors();
+      boolean needsDepCheck = mbd.getDependencyCheck() != 0;
+      PropertyDescriptor[] filteredPds = null;
+      if (hasInstAwareBpps) {
+         if (pvs == null) {
+            pvs = mbd.getPropertyValues();
+         }
+
+         PropertyValues pvsToUse;
+         for(Iterator var9 = this.getBeanPostProcessorCache().instantiationAware.iterator(); var9.hasNext(); pvs = pvsToUse) {
+            InstantiationAwareBeanPostProcessor bp = (InstantiationAwareBeanPostProcessor)var9.next();
+            pvsToUse = bp.postProcessProperties((PropertyValues)pvs, bw.getWrappedInstance(), beanName);
+            if (pvsToUse == null) {
+               if (filteredPds == null) {
+                  filteredPds = this.filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
+               }
+
+               pvsToUse = bp.postProcessPropertyValues((PropertyValues)pvs, filteredPds, bw.getWrappedInstance(), beanName);
+               if (pvsToUse == null) {
+                  return;
+               }
+            }
+         }
+      }
+
+      if (needsDepCheck) {
+         if (filteredPds == null) {
+            filteredPds = this.filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
+         }
+
+         this.checkDependencies(beanName, mbd, filteredPds, (PropertyValues)pvs);
+      }
+
+      if (pvs != null) {
+         this.applyPropertyValues(beanName, mbd, bw, (PropertyValues)pvs);
+      }
+
+   }
+}
+```
+
 
