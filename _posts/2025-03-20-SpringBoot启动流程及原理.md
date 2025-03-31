@@ -528,6 +528,8 @@ public class MyCustomMergedBeanDefinitionPostProcessor implements MergedBeanDefi
 3. 将提前暴露bean的工厂方法放入到三级缓存中
 4. [bean属性填充](#populateBean)
 5. [初始化bean](#initializeBean)
+6. [解决循环依赖](#cirularDependency)
+7. [注册销毁逻辑的bean](#disposableBean)
 ```java
 protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException {
         BeanWrapper instanceWrapper = null;
@@ -588,6 +590,7 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
             throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Initialization of bean failed", var18);
         }
 
+        // 6. 解决循环依赖，从三级缓存中获取bean
         if (earlySingletonExposure) {
             Object earlySingletonReference = this.getSingleton(beanName, false);
             if (earlySingletonReference != null) {
@@ -614,6 +617,7 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
         }
 
         try {
+            // 7. 注册实现了销毁逻辑的bean。在bean初始化完成后，spring会检查该bean在容器关闭时是否需要销毁，并注册到销毁队列中。当容器关闭时，spring会按顺序依次助兴这些bean的销毁逻辑
             this.registerDisposableBeanIfNecessary(beanName, bean, mbd);
             return exposedObject;
         } catch (BeanDefinitionValidationException var16) {
@@ -704,4 +708,79 @@ protected Object initializeBean(String beanName, Object bean, @Nullable RootBean
 		return wrappedBean;
 }
 ```
+
+#### 解决循环依赖 {#cirularDependency}
+1. 先从一级缓存中获取bean
+2. 再尝试从二级缓存中获取提前暴露的bean
+3. 前面两级缓存都没有获取到时，从第三级缓存中获取bean的工厂方法
+4. 从工厂方法中获取到提前暴露的bean，放入二级缓存中，并从三级缓存移除
+```java
+@Nullable
+	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+        // 1. 从单例池中获取bean（一级缓存）
+		Object singletonObject = this.singletonObjects.get(beanName);
+		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+            // 2. 一级缓存中不存在bean时，从二级缓存中获取普通对象/代理对象
+			singletonObject = this.earlySingletonObjects.get(beanName);
+			if (singletonObject == null && allowEarlyReference) {
+				synchronized (this.singletonObjects) {
+					singletonObject = this.singletonObjects.get(beanName);
+					if (singletonObject == null) {
+						singletonObject = this.earlySingletonObjects.get(beanName);
+						if (singletonObject == null) {
+                            // 3. 二级缓存中不存在bean时，从三级缓存中获取bean的工厂方法
+							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+							if (singletonFactory != null) {
+                                // 4. 从工厂方法中获取到提前暴露的bean，放入二级缓存中，并从三级缓存移除
+								singletonObject = singletonFactory.getObject();
+								this.earlySingletonObjects.put(beanName, singletonObject);
+								this.singletonFactories.remove(beanName);
+							}
+						}
+					}
+				}
+			}
+		}
+		return singletonObject;
+	}
+```
+
+#### 销毁逻辑bean的实现方式 {#disposableBean}
+1. Bean 的方法标注了 @PreDestroy 注解
+   ```java
+   @Component
+   public class AService {
+       @PreDestroy
+          public void destroy() {
+              System.out.println("AService destroy");
+      }
+   }
+   ```
+2. Bean实现了DisposableBean接口
+   ```java
+   @Component
+   public class AService implements DisposableBean {
+   
+       @Override
+       public void destroy() throws Exception {
+           System.out.println("AService destroy");
+       }
+   }
+   ```
+3. Bean的destroy-method属性配置了方法名
+   ```java
+   public class CService {
+      public void destroy() {
+         System.out.println("CService destroy");
+      }
+   }
+   
+   @Configuration
+   public class AppConfig {
+      @Bean(destroyMethod = "destroy")
+      public CService cService() {
+         return new CService();
+      }
+   }
+   ```
 
