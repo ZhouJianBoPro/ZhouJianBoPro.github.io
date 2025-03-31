@@ -617,7 +617,7 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
         }
 
         try {
-            // 7. 注册实现了销毁逻辑的bean。在bean初始化完成后，spring会检查该bean在容器关闭时是否需要销毁，并注册到销毁队列中。当容器关闭时，spring会按顺序依次助兴这些bean的销毁逻辑
+            // 7. 注册实现了销毁逻辑的bean。在bean初始化完成后，spring会检查该bean在容器关闭时是否需要销毁，并注册到销毁队列中。当容器关闭时，spring会按顺序依次执行这些bean的销毁逻辑
             this.registerDisposableBeanIfNecessary(beanName, bean, mbd);
             return exposedObject;
         } catch (BeanDefinitionValidationException var16) {
