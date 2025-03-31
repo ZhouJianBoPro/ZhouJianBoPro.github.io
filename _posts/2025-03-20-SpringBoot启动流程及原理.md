@@ -527,6 +527,7 @@ public class MyCustomMergedBeanDefinitionPostProcessor implements MergedBeanDefi
 2. 执行bean的内部处理器
 3. 将提前暴露bean的工厂方法放入到三级缓存中
 4. [bean属性填充](#populateBean)
+5. [初始化bean](#initializeBean)
 ```java
 protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) throws BeanCreationException {
         BeanWrapper instanceWrapper = null;
@@ -560,7 +561,7 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
             }
         }
 
-        // 3. 允许循环情况下（spring.main.allow-circular-references: true），将正在创建的单例bean放入到三级缓存中，三级缓存是用于生成提前暴露bean的工厂方法（lambda表达式）
+        // 3. 允许循环时（spring.main.allow-circular-references: true），将正在创建的单例bean放入到三级缓存中，三级缓存是用于生成提前暴露bean的工厂方法（lambda表达式）
         boolean earlySingletonExposure = mbd.isSingleton() && this.allowCircularReferences && this.isSingletonCurrentlyInCreation(beanName);
         if (earlySingletonExposure) {
             if (this.logger.isTraceEnabled()) {
@@ -577,6 +578,7 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
         try {
             // 4. 属性填充
             this.populateBean(beanName, mbd, instanceWrapper);
+            // 5. 初始化bean
             exposedObject = this.initializeBean(beanName, exposedObject, mbd);
         } catch (Throwable var18) {
             if (var18 instanceof BeanCreationException && beanName.equals(((BeanCreationException)var18).getBeanName())) {
@@ -622,27 +624,16 @@ protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable
 
 #### bean属性填充过程 {#populateBean}
 1. 获取BeanDefinition定义的属性
-2. 获取bean自动装配方式
+2. 执行[注解驱动的依赖注入](#InstantiationAwareBeanPostProcessor)
+3. 进行依赖检查
+4. 将属性应用在Bean实例中
 ```java
 protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
 
       // 1. 获取BeanDefinition定义的属性
       PropertyValues pvs = mbd.hasPropertyValues() ? mbd.getPropertyValues() : null;
-      // 2. 获取bean自动装配方式（@Bean）：0: 不进行自动装配，1:根据属性名自动装配，2:根据属性类型自动装配，3:根据构造函数自动装配
-      int resolvedAutowireMode = mbd.getResolvedAutowireMode();
-      if (resolvedAutowireMode == 1 || resolvedAutowireMode == 2) {
-         MutablePropertyValues newPvs = new MutablePropertyValues((PropertyValues)pvs);
-         if (resolvedAutowireMode == 1) {
-            this.autowireByName(beanName, mbd, bw, newPvs);
-         }
 
-         if (resolvedAutowireMode == 2) {
-            this.autowireByType(beanName, mbd, bw, newPvs);
-         }
-
-         pvs = newPvs;
-      }
-
+      // 2. 处理注解驱动的依赖注入；用于处理@Value，@Autowired，@Resource等注解
       boolean hasInstAwareBpps = this.hasInstantiationAwareBeanPostProcessors();
       boolean needsDepCheck = mbd.getDependencyCheck() != 0;
       PropertyDescriptor[] filteredPds = null;
@@ -654,20 +645,12 @@ protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable B
          PropertyValues pvsToUse;
          for(Iterator var9 = this.getBeanPostProcessorCache().instantiationAware.iterator(); var9.hasNext(); pvs = pvsToUse) {
             InstantiationAwareBeanPostProcessor bp = (InstantiationAwareBeanPostProcessor)var9.next();
+            // 这里会处理@Autowired、@Value，@Resource等注解
             pvsToUse = bp.postProcessProperties((PropertyValues)pvs, bw.getWrappedInstance(), beanName);
-            if (pvsToUse == null) {
-               if (filteredPds == null) {
-                  filteredPds = this.filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
-               }
-
-               pvsToUse = bp.postProcessPropertyValues((PropertyValues)pvs, filteredPds, bw.getWrappedInstance(), beanName);
-               if (pvsToUse == null) {
-                  return;
-               }
-            }
          }
       }
 
+      // 3. 进行依赖检查，检查Bean的所有依赖项是否可用
       if (needsDepCheck) {
          if (filteredPds == null) {
             filteredPds = this.filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
@@ -676,12 +659,49 @@ protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable B
          this.checkDependencies(beanName, mbd, filteredPds, (PropertyValues)pvs);
       }
 
+      // 4. 将属性应用在Bean实例中
       if (pvs != null) {
          this.applyPropertyValues(beanName, mbd, bw, (PropertyValues)pvs);
       }
-
    }
-}
 ```
 
+#### 注解驱动的依赖注入 {#InstantiationAwareBeanPostProcessor}
+- AutowiredAnnotationBeanPostProcessor：处理@Autowired和@Value注解
+- CommonAnnotationBeanPostProcessor：处理@Resource，及生命周期注解（@PostConstruct和@PreDestroy）
+
+#### 初始化Bean {#initializeBean}
+1. 初始化前先处理Aware回调
+2. 执行Bean后置处理器初始化前方法
+3. 调用初始化方法
+4. 执行Bean后置处理器初始化后方法
+```java
+protected Object initializeBean(String beanName, Object bean, @Nullable RootBeanDefinition mbd) {
+
+        // 1. 处理Aware回调（3种），BeanNameAware（可以获取到beanName）, BeanClassLoaderAware（可以获取到CLassLoader），BeanFactoryAware（可以获取到BeanFactory）
+        invokeAwareMethods(beanName, bean);
+
+		Object wrappedBean = bean;
+		if (mbd == null || !mbd.isSynthetic()) {
+            // 2. 执行Bean后置处理器初始化前方法，实现了BeanPostProcessor#postProcessBeforeInitialization的bean，这里同时也会处理 @PostConstruct（由 CommonAnnotationBeanPostProcessor 触发）
+			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+		}
+
+		try {
+            // 3. 调用初始化方法，实现了InitializingBean#afterPropertiesSet接口的bean
+			invokeInitMethods(beanName, wrappedBean, mbd);
+		}
+		catch (Throwable ex) {
+			throw new BeanCreationException(
+					(mbd != null ? mbd.getResourceDescription() : null),
+					beanName, "Invocation of init method failed", ex);
+		}
+		if (mbd == null || !mbd.isSynthetic()) {
+            // 4. 执行Bean后置处理器的初始化后方法，实现了BeanPostProcessor#postProcessAfterInitialization的bean
+			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+		}
+
+		return wrappedBean;
+}
+```
 
