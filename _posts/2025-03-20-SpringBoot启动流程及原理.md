@@ -72,6 +72,9 @@ static WebApplicationType deduceFromClasspath() {
 5. 打印banner
 6. [创建并准备应用上下文](#prepareContext)
 7. [刷新应用上下文](#refreshContext)
+8. 发布应用上下文启动完成事件
+9. 执行所有[自定义Runner](#callRunners)
+10. 发布应用准备就绪事件
 ```java
 // 启动类中main方法中的args是用于接受命令行参数，命令行配置参数将会覆盖其他相同的配置
 public ConfigurableApplicationContext run(String... args) {
@@ -93,12 +96,12 @@ public ConfigurableApplicationContext run(String... args) {
             this.configureIgnoreBeanInfo(environment);
             // 5. 打印banner
             Banner printedBanner = this.printBanner(environment);
-            // 6. 创建应用上下文，通过ApplicationContextFactory创建
+            // 6.1 创建应用上下文，通过ApplicationContextFactory创建
             context = this.createApplicationContext();
             context.setApplicationStartup(this.applicationStartup);
-            // 7. 创建并准备应用上下文
+            // 6.2 创建并准备应用上下文
             this.prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
-            // 8. 刷新应用上下文
+            // 7. 刷新应用上下文
             this.refreshContext(context);
             this.afterRefresh(context, applicationArguments);
             Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
@@ -106,7 +109,9 @@ public ConfigurableApplicationContext run(String... args) {
                 (new StartupInfoLogger(this.mainApplicationClass)).logStarted(this.getApplicationLog(), timeTakenToStartup);
             }
 
+            // 8. 发布应用上下文启动完成事件，事件中包含了应用启动事件
             listeners.started(context, timeTakenToStartup);
+            // 9. 运行所有的自定义Runner，自定义Bean实现ApplicationRunner#run或CommandLineRunner#run
             this.callRunners(context, applicationArguments);
         } catch (Throwable var12) {
             this.handleRunFailure(context, var12, listeners);
@@ -114,6 +119,7 @@ public ConfigurableApplicationContext run(String... args) {
         }
 
         try {
+            // 10. 发布应用准备就绪事件，如dubbo中的服务提供者向注册中心完成注册服务是在该阶段
             Duration timeTakenToReady = Duration.ofNanos(System.nanoTime() - startTime);
             listeners.ready(context, timeTakenToReady);
             return context;
@@ -232,6 +238,7 @@ private void prepareContext(DefaultBootstrapContext bootstrapContext, Configurab
 5. 初始化[事件广播器](#eventMulticaster)
 6. 注册事件监听器
 7. 完成[Bean的初始化](#finishBeanFactoryInitialization)
+8. 完成上下文刷新，发布上下文刷新完成事件
 ```java
 public void refresh() throws BeansException, IllegalStateException {
         synchronized(this.startupShutdownMonitor) {
@@ -261,6 +268,7 @@ public void refresh() throws BeansException, IllegalStateException {
                 this.registerListeners();
                 // 7. 完成Bean的初始化，实例化所有非懒加载的Bean（会触发完整Bean的生命周期：实例化 -> 属性填充 -> BeanPostProcessor前置处理 -> 初始化方法 (@PostConstruct, InitializingBean) -> BeanPostProcessor后置处理）
                 this.finishBeanFactoryInitialization(beanFactory);
+                // 8. 完成上下文刷新，发布上下文已经刷新的事件
                 this.finishRefresh();
             } catch (BeansException var10) {
                 if (this.logger.isWarnEnabled()) {
@@ -781,6 +789,28 @@ protected Object initializeBean(String beanName, Object bean, @Nullable RootBean
       public CService cService() {
          return new CService();
       }
+   }
+   ```
+   
+#### 自定义Runners {#callRunners}
+- 实现ApplicationRunner#run
+   ```java
+   @Component
+   public class CustomApplicationRunner implements ApplicationRunner {
+       @Override
+       public void run(ApplicationArguments args) throws Exception {
+           System.out.println("执行自定义ApplicationRunner, args = " + args);
+       }
+   }
+   ```
+- 实现CommandLineRunner#run
+   ```java
+   @Component
+   public class CustomCommandLineRunner implements CommandLineRunner {
+       @Override
+       public void run(String... args) throws Exception {
+           System.out.println("自定义CustomCommandLineRunner， args = " + args);
+       }
    }
    ```
 
