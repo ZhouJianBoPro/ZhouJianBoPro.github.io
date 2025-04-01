@@ -1,6 +1,6 @@
 ---
 layout: post
-title: SpringBoot启动流程及原理
+title: SpringBoot启动过程及源码解析
 date: 2025-03-20
 tags: [springboot]
 ---
