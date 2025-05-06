@@ -13,6 +13,20 @@ tags: [thread]
 #### 线程池的工作流程图
 ![线程池工作流程图](/images/threadpool.png)
 
+#### 线程池的五种状态
+```java
+private static final int RUNNING    = -1 << COUNT_BITS;
+private static final int SHUTDOWN   =  0 << COUNT_BITS;
+private static final int STOP       =  1 << COUNT_BITS;
+private static final int TIDYING    =  2 << COUNT_BITS;
+private static final int TERMINATED =  3 << COUNT_BITS;
+```
+- RUNNING: 可接受新任务并处理队列中的任务
+- SHUTDOWN: 不接受新任务，但可以处理队列中的任务
+- STOP：不接受新任务，不处理队列中的任务，中断正在进行中的任务
+- TIDYING：线程池内线程全部执行完毕，等待回收，进入TIDYING状态
+- TERMINATED：终止状态
+
 #### 线程池的创建
 线程池的创建是通过ThreadPoolExecutor来完成的，ThreadPoolExecutor继承AbstractExecutorService，而AbstractExecutor实现ExecutorService接口
 ```java
@@ -42,7 +56,7 @@ public abstract class AbstractExecutorService implements ExecutorService {
 }
 ```
 - corePoolSize
->核心池大小。当一个任务提交到线程池时，首先会判断当前核心池的大小，若当前核心池数量小于corePoolSize时，
+>核心池大小。当一个任务提交到线程池时，首先会判断当前核心池的大小，若当前线程数量小于corePoolSize时，
 则会创建新的线程执行此任务，反之不会创建新线程，而是去判断阻塞队列
 - maximumPoolSize
 >线程池最大线程数。当阻塞队列已满，并且当前池内线程数小于maximumPoolSize时，也会创建新的线程执行此任务
@@ -93,22 +107,21 @@ public abstract class AbstractExecutorService implements ExecutorService {
 }
 ```
 
-#### BlockingQueue阻塞队列策略
-- SynchronousQueue（同步队列）
->默认的阻塞队列，该队列没有容量不存储任务，直接提交任务给线程，因此会创建新线程执行任务。若线程池内线程数超过了maximumPoolSize无可创建线程时，
-会导致任务加入队列失败。因此，使用该策略时通常使用无界maximumPoolSize，以避免拒绝新提交的任务。
-Executors.newCachedThreadPool()方式创建线程池使用到SynchronousQueue阻塞队列
-- LinkedBlockingQueue（无界阻塞队列）
->基于链表的阻塞队列，该阻塞队列容量默认为Integer.MAX，因此也称之为无界阻塞队列。当线程池内线程数达到corePoolSize时，
-新任务到达后，放入该队列进行等待执行。由于该队列是无界的（不存在队列已满的情况），因此按corePollSize = maximumPoolSize配置即可，
-同时也不会存在空闲线程销毁的场景。Executors.newFixedThreadPool()，Executors.newSingleThreadExecutor()方式创建的线程池使用到LinkedBlockingQueue阻塞队列
+#### BlockingQueue阻塞队列
+- SynchronousQueue（同步移交队列）
+>默认的阻塞队列，该队列容量为0不存储任务，每次会直接创建新的线程执行任务。若线程池内线程数超过了maximumPoolSize时，会导致任务加入队列失败执行拒绝策略。该阻塞队列适用于低延迟任务。Executors.newCachedThreadPool()方式创建线程池使用到SynchronousQueue阻塞队列
 - ArrayBlockingQueue（有界阻塞队列）
->基于数组的阻塞队列，需要设置队列的初始容量。当线程池内的线程数达到corePoolSize时，新到达的任务会放入该队列中。
-当该队列容量已满时，且池内线程数不超过maximumPoolSize，此时会创建新线程来执行任务，否则会对任务作拒绝处理。
+>基于数组的阻塞队列，需要设置队列的初始容量，并且基于先进先出（FIFO）处理队列中的任务。当线程池内的线程数达到corePoolSize时，新到达的任务会放入该队列中。当该队列容量已满时，且池内线程数不超过maximumPoolSize，此时会创建新线程来执行任务，否则会对任务作拒绝处理。该阻塞队列适用于CPU密集型的任务
+- LinkedBlockingQueue（无界阻塞队列）
+>基于链表的阻塞队列，该阻塞队列容量默认为Integer.MAX。当线程池内线程数达到corePoolSize时，新任务到达后，放入该队列进行等待执行。由于该队列是无界的（不存在队列已满的情况），因此maximumPoolSize配置无效（池内线程数永远不会超过corePoolSize），同时也不会存在空闲线程销毁的场景。适用于IO密集型的任务，Executors.newFixedThreadPool()，Executors.newSingleThreadExecutor()方式创建的线程池使用到LinkedBlockingQueue阻塞队列
+- PriorityBlockingQueue（优先级阻塞队列）
+>该队列为链表结构，并且也是一个无界队列，该队列可以按照优先级处理任务。无界队列可能由于队列中的任务过多导致OOM
+- DelayQueue（延迟队列）
+>ScheduledThreadPoolExecutor专用，适用于定时/周期性的任务
 
 #### RejectedExecutionHandler任务拒绝策略
-当阻塞队列和线程池内最大线程数已满的情况下会使用任务拒绝策略
-- AbortPolicy（拒绝任务并抛出异常）
->默认拒绝策略，拒绝提交的任务，并抛出RejectExecutionException异常
-- DiscardPolicy（不处理丢弃任务）
+针对有界队列，当阻塞队列和线程池内最大线程数已满的情况下会使用任务拒绝策略
+- AbortPolicy：默认拒绝策略，拒绝提交的任务，并抛出RejectExecutionException异常
+- DiscardPolicy：不处理丢弃任务，适用于日志或监控系统
 - DiscardOldestPolicy：丢弃阻塞队列中最早的任务
+- CallerRunsPolicy：由调用者执行，会影响任务的提交效率
