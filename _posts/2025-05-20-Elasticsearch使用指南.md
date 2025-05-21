@@ -206,7 +206,7 @@ tags: [elasticsearch]
     ```
   
 #### 分页查询
-- 按条件简单分页查询（不适合深度分页）：GET /index_name/_search
+- 按条件简单分页查询（from/size不适合深度分页）：GET /index_name/_search，可以获取数据总量及页码
     ```javascript
     {
         "from": 0,
@@ -218,7 +218,7 @@ tags: [elasticsearch]
         }
     }
     ```
-- 按条件深度分页查询（search_after）:GET /index_name/_search，需要把上一页的值传过来，不支持跳页
+- 按条件深度分页查询（search_after）:GET /index_name/_search，需要把上一页key传过来，不支持跳页，同时也不能获取数据总量及页码
     ```javascript
     {
         "size": 5,
