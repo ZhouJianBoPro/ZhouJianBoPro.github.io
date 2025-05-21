@@ -57,7 +57,7 @@ tags: [elasticsearch]
 
 #### 索引（Index）操作
 - 创建index：PUT /<index_name>，以下索引设置number_of_shards（主分片数量），number_of_replicas（每个主分片对应副本分片数量），并对索引字段设置了分析器和过滤器
-```json
+```javascript
 {
   "sys_user": {
     "aliases": {},
@@ -129,7 +129,7 @@ tags: [elasticsearch]
 - 查看已有索引的映射：GET /<index_name>/_mapping
 - 更新/删除映射（不支持更改已有字段的映射）
 - 新增字段映射：PUT /<index_name>/_mapping
-```json
+```javascript
 {
   "properties": {
     "update_by": {
@@ -141,7 +141,7 @@ tags: [elasticsearch]
   
 #### 文档（Document）操作
 - 新增文档（_id可指定或自动生成）：POST /<index_name>/_doc/<_id>
-    ```json
+    ```javascript
     {
       "create_by": "admin",
       "create_time": "2025-05-21 13:10:11",
@@ -153,7 +153,7 @@ tags: [elasticsearch]
     ```
 - 根据_id查询文档：GET /<index_name>/_doc/<_id>
 - 按条件查询文档（match）：GET /<index_name>/_search，适用于text类型字段
-    ```json
+    ```javascript
     {
       "query": {
         "match": {
@@ -163,7 +163,7 @@ tags: [elasticsearch]
     }
     ```
 - 精确查询文档（term/terms）：GET /<index_name>/_search，适用于keyword类型字段。text类型字段如果要实现精确查询，需要在该字段设置keyword类型的子字段
-    ```json
+    ```javascript
     {
         "query": {
             "term": {
@@ -174,7 +174,7 @@ tags: [elasticsearch]
     ```
 - 通过ID删除文档：DELETE /<index_name>/_doc/<_id>
 - 按条件精确删除文档（term/terms）：POST /<index_name>/_delete_by_query
-    ```json
+    ```javascript
     {
       "query": {
         "term": {
@@ -184,7 +184,7 @@ tags: [elasticsearch]
     }
     ```
 - 通过ID更新文档：POST /<index_name>/_update/<_id>
-    ```json
+    ```javascript
     {
       "doc": {
         "create_by": "new_admin"
@@ -192,7 +192,7 @@ tags: [elasticsearch]
     }
     ```
 - 按条件更新文档：POST /<index_name>/_update_by_query
-    ```json
+    ```javascript
     {
       "script": {
         "source": "ctx._source.realname = '新名称'; ctx._source.username = 'new_admin'"
@@ -207,7 +207,7 @@ tags: [elasticsearch]
   
 #### 分页查询
 - 按条件简单分页查询（不适合深度分页）：GET /<index_name>/_search
-    ```json
+    ```javascript
     {
         "from": 0,
         "size": 5,
@@ -219,7 +219,7 @@ tags: [elasticsearch]
     }
     ```
 - 按条件深度分页查询（search_after）:GET /<index_name>/_search，需要把上一页的值传过来，不支持跳页
-    ```json
+    ```javascript
     {
         "size": 5,
         "query": {
@@ -238,7 +238,7 @@ tags: [elasticsearch]
     }
     ```
 - 聚合分页并求和（terms 聚合 + sum 求和 + after_key 分）：GET /sys_user/_search
-    ```json
+    ```javascript
     {
       "size": 0,
       "query": {
