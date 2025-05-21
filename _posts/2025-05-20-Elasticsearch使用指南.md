@@ -272,7 +272,7 @@ tags: [elasticsearch]
 
 - 按条件全量导出数据（scroll）
   1. 初始查询：POST /sys_user/_search?scroll=2m，获取第一页数据并返回了scroll_id
-      ```json
+      ```javascript
       {
         "query": {
           "match": {
@@ -283,14 +283,14 @@ tags: [elasticsearch]
       }
       ```
   2. 获取下一页数据（传入上一页返回的scroll_id）：POST /_search/scroll，返回下一页数据，循环执行直到无数据返回
-        ```json
+        ```javascript
         {
           "scroll": "2m",
           "scroll_id": "FGluY2x1ZGVfY29udGV4dF91dWlkDnF1ZXJ5VGhlbkZldGNoAxY5bHd5ZlptNFQ2U1JNSWFKeHlqV1BnAAAAAAABWr0WNjBjTWhFMnBTS2F4QzE0ZnhSYW1mURY5bHd5ZlptNFQ2U1JNSWFKeHlqV1BnAAAAAAABWr4WNjBjTWhFMnBTS2F4QzE0ZnhSYW1mURY5bHd5ZlptNFQ2U1JNSWFKeHlqV1BnAAAAAAABWr8WNjBjTWhFMnBTS2F4QzE0ZnhSYW1mUQ=="
         }
         ```
   3. 删除scroll_id：DELETE /_search/scroll
-      ```json
+      ```javascript
       {
         "scroll_id": "<your_scroll_id>"
       }
