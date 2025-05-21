@@ -56,7 +56,7 @@ tags: [elasticsearch]
 
 
 #### 索引（Index）操作
-- 创建index：PUT /<index_name>，以下索引设置number_of_shards（主分片数量），number_of_replicas（每个主分片对应副本分片数量），并对索引字段设置了分析器和过滤器
+- 创建index：PUT /index_name，以下索引设置number_of_shards（主分片数量），number_of_replicas（每个主分片对应副本分片数量），并对索引字段设置了分析器和过滤器
 ```javascript
 {
   "sys_user": {
@@ -121,14 +121,14 @@ tags: [elasticsearch]
   }
 }
 ```
-- 检查索引是否存在：HEAD /<index_name>
-- 获取索引信息：GET /<index_name>
-- 删除索引：DELETE /<index_name>
+- 检查索引是否存在：HEAD /index_name
+- 获取索引信息：GET /index_name
+- 删除索引：DELETE /index_name
 
 #### 映射（Mapping）操作
-- 查看已有索引的映射：GET /<index_name>/_mapping
+- 查看已有索引的映射：GET /index_name/_mapping
 - 更新/删除映射（不支持更改已有字段的映射）
-- 新增字段映射：PUT /<index_name>/_mapping
+- 新增字段映射：PUT /index_name/_mapping
 ```javascript
 {
   "properties": {
@@ -140,7 +140,7 @@ tags: [elasticsearch]
 ```
   
 #### 文档（Document）操作
-- 新增文档（_id可指定或自动生成）：POST /<index_name>/_doc/<_id>
+- 新增文档（_id可指定或自动生成）：POST /index_name/_doc/_id
     ```javascript
     {
       "create_by": "admin",
@@ -151,8 +151,8 @@ tags: [elasticsearch]
       "username": "admin"
     }
     ```
-- 根据_id查询文档：GET /<index_name>/_doc/<_id>
-- 按条件查询文档（match）：GET /<index_name>/_search，适用于text类型字段
+- 根据_id查询文档：GET /index_name/_doc/_id
+- 按条件查询文档（match）：GET /index_name/_search，适用于text类型字段
     ```javascript
     {
       "query": {
@@ -162,7 +162,7 @@ tags: [elasticsearch]
       }
     }
     ```
-- 精确查询文档（term/terms）：GET /<index_name>/_search，适用于keyword类型字段。text类型字段如果要实现精确查询，需要在该字段设置keyword类型的子字段
+- 精确查询文档（term/terms）：GET /index_name/_search，适用于keyword类型字段。text类型字段如果要实现精确查询，需要在该字段设置keyword类型的子字段
     ```javascript
     {
         "query": {
@@ -172,8 +172,8 @@ tags: [elasticsearch]
         }
     }
     ```
-- 通过ID删除文档：DELETE /<index_name>/_doc/<_id>
-- 按条件精确删除文档（term/terms）：POST /<index_name>/_delete_by_query
+- 通过ID删除文档：DELETE /index_name/_doc/_id
+- 按条件精确删除文档（term/terms）：POST /index_name/_delete_by_query
     ```javascript
     {
       "query": {
@@ -183,7 +183,7 @@ tags: [elasticsearch]
       }
     }
     ```
-- 通过ID更新文档：POST /<index_name>/_update/<_id>
+- 通过ID更新文档：POST /index_name/_update/_id
     ```javascript
     {
       "doc": {
@@ -191,7 +191,7 @@ tags: [elasticsearch]
       }
     }
     ```
-- 按条件更新文档：POST /<index_name>/_update_by_query
+- 按条件更新文档：POST /index_name/_update_by_query
     ```javascript
     {
       "script": {
@@ -206,7 +206,7 @@ tags: [elasticsearch]
     ```
   
 #### 分页查询
-- 按条件简单分页查询（不适合深度分页）：GET /<index_name>/_search
+- 按条件简单分页查询（不适合深度分页）：GET /index_name/_search
     ```javascript
     {
         "from": 0,
@@ -218,7 +218,7 @@ tags: [elasticsearch]
         }
     }
     ```
-- 按条件深度分页查询（search_after）:GET /<index_name>/_search，需要把上一页的值传过来，不支持跳页
+- 按条件深度分页查询（search_after）:GET /index_name/_search，需要把上一页的值传过来，不支持跳页
     ```javascript
     {
         "size": 5,
