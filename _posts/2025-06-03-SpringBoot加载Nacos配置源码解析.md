@@ -1,7 +1,7 @@
 ---
 layout: post
 title: SpringBoot加载Nacos配置源码解析
-date: 2025-05-29
+date: 2025-06-03
 tags: [nacos]
 ---
 
