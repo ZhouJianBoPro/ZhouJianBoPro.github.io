@@ -156,17 +156,17 @@ tags: [concurrency]
    store.db.distributedLockTable=distributed_lock
    ```
 5. 将镜像运行容器
-```shell
-containt_name=seata-dev
-image_name=seataio/seata-server:latest
-docker stop $containt_name
-docker rm -f $containt_name
-
-# 获取宿主机IP（linux 可通过 --network host指定本地）
-HOST_IP=$(ifconfig en0 | grep "inet " | awk '{print $2}')
-# 运行容器，映射console端口（7091），映射server端口（8091），挂载配置文件，挂载日志目录
-docker run -d --name=$containt_name -p 7091:7091 -p 8091:8091 -e SEATA_IP=$HOST_IP --privileged=true --restart=always -v $PWD/resources:/seata-server/resources -v $PWD/logs:/root/logs/seata $image_name
-```
+   ```shell
+   containt_name=seata-dev
+   image_name=seataio/seata-server:latest
+   docker stop $containt_name
+   docker rm -f $containt_name
+   
+   # 获取宿主机IP（linux 可通过 --network host指定本地）
+   HOST_IP=$(ifconfig en0 | grep "inet " | awk '{print $2}')
+   # 运行容器，映射console端口（7091），映射server端口（8091），挂载配置文件，挂载日志目录
+   docker run -d --name=$containt_name -p 7091:7091 -p 8091:8091 -e SEATA_IP=$HOST_IP --privileged=true --restart=always -v $PWD/resources:/seata-server/resources -v $PWD/logs:/root/logs/seata $image_name
+   ```
 
 
 
