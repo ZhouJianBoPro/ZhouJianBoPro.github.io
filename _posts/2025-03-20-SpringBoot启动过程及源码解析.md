@@ -171,8 +171,9 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
 ##### SpringBoot 配置优先级规则（从低到高）
 1. 默认属性：通过 SpringApplication.setDefaultProperties 设置的属性
 2. 配置文件：如application.properties
-3. 操作系统属性和Java系统属性
-4. 命令行参数
+3. 配置中心：如nacos
+4. 操作系统属性和Java系统属性
+5. 命令行参数
 
 #### 应用上下文准备过程 {#prepareContext}
 1. 应用上下文后置处理器
