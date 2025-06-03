@@ -44,59 +44,59 @@ springboot可以基于自动配置特性来快速集成组件，只需要引入�
 2. @EnableAutoConfiguration注解导入了AutoConfigurationImportSelector类，@Import(AutoConfigurationImportSelector.class）
 3. AutoConfigurationImportSelector实现了DeferredImportSelector接口（用于延迟加载自动配置类，因为自动配置类中有条件注解，如@ConditionalOnBean，需要让其他bean先加载） 
 4. AutoConfigurationImportSelector#getAutoConfigurationEntry方法加载自动配置类
-```java
-//AnnotationMetadata注解元数据指的是springboot启动类
-protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
-        if (!this.isEnabled(annotationMetadata)) {
-            return EMPTY_ENTRY;
-        } else {
-            // 1. 获取自动配置注解属性，exclude = {}, excludeName = {}, 有可能需要排除一些自动配置类
-            AnnotationAttributes attributes = this.getAttributes(annotationMetadata);
-            // 2. 通过SpringFactoriesLoader加载META-INF/spring.factories文件中的配置类（仅获取自动配置类）
-            List<String> configurations = this.getCandidateConfigurations(annotationMetadata, attributes);
-            // 3. 对扫描到的自动配置类去重
-            configurations = this.removeDuplicates(configurations);
-            // 4. 过滤掉在注解中排除的自动配置类
-            Set<String> exclusions = this.getExclusions(annotationMetadata, attributes);
-            this.checkExcludedClasses(configurations, exclusions);
-            configurations.removeAll(exclusions);
-
-            // 5. 过滤（条件注解的判断在此阶段进行），AutoConfigurationImportFilter#mach 通过条件注解判断是否加载自动配置类
-            configurations = this.getConfigurationClassFilter().filter(configurations);
-            
-            // 6. 触发自动配置导入事件
-            this.fireAutoConfigurationImportEvents(configurations, exclusions);
-            return new AutoConfigurationEntry(configurations, exclusions);
-        }
-}
-
-// 获取候选的自动配置类
-protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
-    // 通过spring spi中的SpringFactoriesLoader加载META-INF/spring.factories文件中的自动配置类，key为EnableAutoConfiguration类全限定名
-   List<String> configurations = new ArrayList(SpringFactoriesLoader.loadFactoryNames(this.getSpringFactoriesLoaderFactoryClass(), this.getBeanClassLoader()));
-   ImportCandidates.load(AutoConfiguration.class, this.getBeanClassLoader()).forEach(configurations::add);
-   Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories nor in META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports. If you are using a custom packaging, make sure that file is correct.");
-   return configurations;
-}
-
-// 获取SpringFactoriesLoaderFactoryClass， 用于过滤出spring.factories中key为EnableAutoConfiguration类全限定名的自动配置类
-protected Class<?> getSpringFactoriesLoaderFactoryClass() {
-    return EnableAutoConfiguration.class;
-}
-
-// 获取自动配置注解属性，exclude = {}, excludeName = {}
-protected AnnotationAttributes getAttributes(AnnotationMetadata metadata) {
-    // 获取@EnableAutoConfiguration 注解属性exclude = {}, excludeName = {}
-   String name = this.getAnnotationClass().getName();
-   AnnotationAttributes attributes = AnnotationAttributes.fromMap(metadata.getAnnotationAttributes(name, true));
-   Assert.notNull(attributes, () -> {
-      return "No auto-configuration attributes found. Is " + metadata.getClassName() + " annotated with " + ClassUtils.getShortName(name) + "?";
-   });
-   return attributes;
-}
-
-protected Class<?> getAnnotationClass() {
-   return EnableAutoConfiguration.class;
-}
-```
+    ```java
+    //AnnotationMetadata注解元数据指的是springboot启动类
+    protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
+            if (!this.isEnabled(annotationMetadata)) {
+                return EMPTY_ENTRY;
+            } else {
+                // 1. 获取自动配置注解属性，exclude = {}, excludeName = {}, 有可能需要排除一些自动配置类
+                AnnotationAttributes attributes = this.getAttributes(annotationMetadata);
+                // 2. 通过SpringFactoriesLoader加载META-INF/spring.factories文件中的配置类（仅获取自动配置类）
+                List<String> configurations = this.getCandidateConfigurations(annotationMetadata, attributes);
+                // 3. 对扫描到的自动配置类去重
+                configurations = this.removeDuplicates(configurations);
+                // 4. 过滤掉在注解中排除的自动配置类
+                Set<String> exclusions = this.getExclusions(annotationMetadata, attributes);
+                this.checkExcludedClasses(configurations, exclusions);
+                configurations.removeAll(exclusions);
+    
+                // 5. 过滤（条件注解的判断在此阶段进行），AutoConfigurationImportFilter#mach 通过条件注解判断是否加载自动配置类
+                configurations = this.getConfigurationClassFilter().filter(configurations);
+                
+                // 6. 触发自动配置导入事件
+                this.fireAutoConfigurationImportEvents(configurations, exclusions);
+                return new AutoConfigurationEntry(configurations, exclusions);
+            }
+    }
+    
+    // 获取候选的自动配置类
+    protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+        // 通过spring spi中的SpringFactoriesLoader加载META-INF/spring.factories文件中的自动配置类，key为EnableAutoConfiguration类全限定名
+       List<String> configurations = new ArrayList(SpringFactoriesLoader.loadFactoryNames(this.getSpringFactoriesLoaderFactoryClass(), this.getBeanClassLoader()));
+       ImportCandidates.load(AutoConfiguration.class, this.getBeanClassLoader()).forEach(configurations::add);
+       Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories nor in META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports. If you are using a custom packaging, make sure that file is correct.");
+       return configurations;
+    }
+    
+    // 获取SpringFactoriesLoaderFactoryClass， 用于过滤出spring.factories中key为EnableAutoConfiguration类全限定名的自动配置类
+    protected Class<?> getSpringFactoriesLoaderFactoryClass() {
+        return EnableAutoConfiguration.class;
+    }
+    
+    // 获取自动配置注解属性，exclude = {}, excludeName = {}
+    protected AnnotationAttributes getAttributes(AnnotationMetadata metadata) {
+        // 获取@EnableAutoConfiguration 注解属性exclude = {}, excludeName = {}
+       String name = this.getAnnotationClass().getName();
+       AnnotationAttributes attributes = AnnotationAttributes.fromMap(metadata.getAnnotationAttributes(name, true));
+       Assert.notNull(attributes, () -> {
+          return "No auto-configuration attributes found. Is " + metadata.getClassName() + " annotated with " + ClassUtils.getShortName(name) + "?";
+       });
+       return attributes;
+    }
+    
+    protected Class<?> getAnnotationClass() {
+       return EnableAutoConfiguration.class;
+    }
+    ```
 
