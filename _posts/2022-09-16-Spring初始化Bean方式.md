@@ -1,6 +1,6 @@
 ---
 layout: post
-title: spring初始化Bean方式
+title: Spring初始化Bean方式
 date: 2022-09-16
 tags: [spring]
 ---
