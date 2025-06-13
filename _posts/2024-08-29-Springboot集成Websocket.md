@@ -6,15 +6,15 @@ tags: [other]
 ---
 
 ### 什么是Websocket
-Websocket是一种在单个tcp连接上进行双向通信的协议。即浏览器端与服务端通过一次握手后建立长连接，
-实现客户端和服务端的数据交换。服务端可以主动向客户端发送消息。
+> Websocket是一种在单个tcp连接上进行双向通信的协议。即浏览器端与服务端通过一次握手后建立长连接，
+> 实现客户端和服务端的数据交换。服务端可以主动向客户端发送消息。
 
 ### 连接建立过程
 ![连接建立过程](/images/websocket-link.png)
-1. 客户端发起握手请求：发送一个特殊的http请求，请求头中包含需要升级为websocket协议。
-2. 服务端握手拦截器：用于websocket在建立连接前的预处理。如日志处理、身份验证和自定义参数处理等。
-3. 服务端握手响应：拦截器同意建立连接时返回101状态码，同时响应头包含websocket升级协议。
-4. 连接建立成功后处理：如将用户与连接信息绑定，给客户端发送连接成功消息
+> 1. 客户端发起握手请求：发送一个特殊的http请求，请求头中包含需要升级为websocket协议。
+> 2. 服务端握手拦截器：用于websocket在建立连接前的预处理。如日志处理、身份验证和自定义参数处理等。
+> 3. 服务端握手响应：拦截器同意建立连接时返回101状态码，同时响应头包含websocket升级协议。
+> 4. 连接建立成功后处理：如将用户与连接信息绑定，给客户端发送连接成功消息
 
 ### 握手拦截器
 ```java
@@ -40,10 +40,10 @@ public class DispatchHandshakeInterceptor implements HandshakeInterceptor {
 该拦截器用于获取客户端传入的token，每个token绑定了一个WebSocketSession，目的是为了实现用户与连接绑定
 
 ### 心跳机制
-1. 空闲连接默认在60s内没进行数据交换，会自动断开连接
-2. 网络等原因也可能会中断连接，比如服务端重启
-3. 心跳机制用于检测连接是否正常，当发现断开时，可以尝试重新建立连接
-4. 可以由客户端定时发送心跳请求（不超过60s）, 服务端收到请求后返回响应。该请求不会触发任何业务逻辑
+> 1. 空闲连接默认在60s内没进行数据交换，会自动断开连接
+> 2. 网络等原因也可能会中断连接，比如服务端重启
+> 3. 心跳机制用于检测连接是否正常，当发现断开时，可以尝试重新建立连接
+> 4. 可以由客户端定时发送心跳请求（不超过60s）, 服务端收到请求后返回响应。该请求不会触发任何业务逻辑
 
 ### websocket处理器
 ```java
@@ -142,16 +142,16 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 1. 问题：当服务端需要将消息广播给所有建立连接的客户端时，当前节点只能发送给与该节点建立连接的客户端，无法发送给其他节点的连接客户端
 2. 解决方案：使用redis发布订阅或消息队列，将消息广播给所有节点，然后由每个节点根据自身连接情况，选择是否将消息发送给客户端
 3. 使用redis发布订阅功能发布websocket消息
-```java
-/**
- * 使用redis发布订阅功能发布websocket消息
- * @param message
- */
-private void publishWebsocketMessage(String message) {
-    RTopic rTopic = redissonClient.getTopic(RedisKeyConstant.TOPIC_WEBSOCKET);
-    rTopic.publish(message);
-}
-```
+    ```java
+    /**
+     * 使用redis发布订阅功能发布websocket消息
+     * @param message
+     */
+    private void publishWebsocketMessage(String message) {
+        RTopic rTopic = redissonClient.getTopic(RedisKeyConstant.TOPIC_WEBSOCKET);
+        rTopic.publish(message);
+    }
+    ```
 4. 使用redis订阅功能监听topic消息，将消息发送给客户端
 ```java
 @Component
