@@ -32,10 +32,8 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
     if ((tab = table) == null || (n = tab.length) == 0)
         n = (tab = resize()).length;
     
-    // i = (n - 1) & hash 通过位与运算计算出元素对应hash值在数组中的下标
-    // (n - 1) n为数据长度， -1的目的：1. 避免数组越界 2. 使得计算出来的下标更加均匀
+    // i = (n - 1) & hash 通过位与运算计算出元素对应hash值在数组中的下标，等同于hash % n，位与运算效率更高
     // 如果直接用n进行位与运算，假设初始化数组长度为16，二进制码为0001 0000（省略前面24位），会导致与其他任意hash值位与运算后得出的下标要么为0要么为16
-    // 为什么不使用取模运算(hash % n)，原因是位运算速度比普通运算要快很多
     // p为该数组下标已存在的元素，可以称为前驱元素
     if ((p = tab[i = (n - 1) & hash]) == null)
         // 该数组下标没有元素，创建一个新元素放入该下标中
@@ -81,7 +79,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
     }
     ++modCount;
     
-    // 当元素新增时（key不存在），对hashMap中的size进行累加并再次检查扩容
+    // 当元素新增时（key不存在），对hashMap中的size进行累加并再次检查扩容，n = 2 * n， 这样扩容后得到的（n - 1）转换为2进制低位都为1
     if (++size > threshold)
         resize();
     afterNodeInsertion(evict);
@@ -92,7 +90,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 ### put方法执行过程
 1. 先计算元素键值的hash值，(h = key.hashCode()) ^ (h >>> 16) 
 2. 判断数组是否需要进行初始化，如果数组为空时，需要调用resize方法进行初始化
-3. 通过hash值计算出元素在数组中的下标，（n - 1）& hash
+3. 通过hash值计算出元素在数组中的下标，（n - 1）& hash = hash % n
 4. 检查数组在该下标中是否存在元素，不存在时创建一个新元素放入到该下标中
 5. 当该下标存在元素时（哈希冲突），首先判断已存在的元素键值是否与当前键值相等（hash值与键值都相等）。相等时直接修改值，并且返回返回旧值，程序结束
 6. 反之再判断下标已存在的元素是否为红黑树结构，如果是的话将元素插入到红黑树中
@@ -105,3 +103,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 2. 尾插法：在链表尾部插入元素，需要遍历整个链表，时间复杂度为O(n), 其中n为链表长度
 3. jdk1.7 hashMap链表采用了头插法，而1.8采用的是尾插法
 4. 在插入效率上头插法更快，因为无需遍历链表；但是在多线程中，使用头插法可能导致链表闭环；尾插法生成的链表顺序与插入顺序一致，而头插法相反
+
+#### 并发访问下引发的问题
+1. 写入时发生hash冲突时可能会导致值被覆盖
+2. jdk1.7及以下使用链表头插法，可能会导致链表形成闭环，在访问时会导致死循环
