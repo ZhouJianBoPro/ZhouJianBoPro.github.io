@@ -140,4 +140,5 @@ public class ThreadLocal<T> {
         }
     }
     ```
+3. Spring事务管理器管理Connection（ThreadLocal<Map<DataSource, Connection>>）
 
