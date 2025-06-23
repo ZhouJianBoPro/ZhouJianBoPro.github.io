@@ -255,7 +255,7 @@ public void refresh() throws BeansException, IllegalStateException {
                 // 3.1 BeanFactory后置处理器，允许在BeanFactory配置完成后，但在Bean实例化前，对BeanFactory进行自定义配置或扩展。可以通过实现BeanFactoryPostProcessor接口并重写postProcessBeanFactory方法
                 this.postProcessBeanFactory(beanFactory);
                 StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
-                // 3.2 执行BeanFactory后置处理器
+                // 3.2 执行所有的BeanFactoryPostProcessor，允许在实例化BeanDefinition之前添加或修改BeanFactory中的BeanDefinition，如进行Mapper接口扫描、@ComponentScan包扫描
                 this.invokeBeanFactoryPostProcessors(beanFactory);
                 // 4. 注册Bean后置处理器：从BeanFactory获取所有的实现了BeanPostProcessor的Bean定义，并注册到BeanFactory中。区分内部/外部处理器，而且外部处理器有顺序优先级
                 this.registerBeanPostProcessors(beanFactory);
