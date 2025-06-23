@@ -12,7 +12,7 @@ tags: [spring]
 
 #### ConfigurationClassPostProcessor作用
 > ConfigurationClassPostProcessor实现了BeanFactoryPostProcessor接口，在容器刷新阶段refresh() -> invokeBeanFactoryPostProcessor()中被调用，
-> 它主要作用是处理标注了@Configuration、@ComponentScan、@Import、@Bean等注解的配置类，
+> 它主要作用是过滤出标注了@Configuration的候选配置类，然后解析类中的@ComponentScan、@Import、@Bean等注解的配置类，
 > 并扫描出这些类所定义的BeanDefinition。它是Spring容器启动过程中解析配置类的核心文件
 - 解析@Configuration注解的类：将@Bean注解的方法解析为BeanDefinition
 - 处理@ComponentScan注解的类：将路径下的@Component、@Service、@Repository、@Controller注解的类解析为BeanDefinition
