@@ -8,30 +8,6 @@ tags: [springboot]
 #### SpringApplication初始化
 ```java
 public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
-        this.sources = new LinkedHashSet();
-        this.bannerMode = Mode.CONSOLE;
-        // 应用启动时输出日志：SpringBoot版本，Java版本，Web应用类型等
-        this.logStartupInfo = true;
-        // 设置为true时会将命令行参数添加到spring环境中
-        this.addCommandLineProperties = true;
-        // 类型转换及数据绑定，如在处理 REST 请求时，将 URL 参数或请求体中的数据绑定到 Java 对象
-        this.addConversionService = true;
-        // 无头模式，会仅用所有与图形相关功能，如AWT和Swing，从而减少内存占用
-        this.headless = true;
-        // 在JVM关闭或中断时，优雅的关闭spring应用上下文，如关闭数据库连接池，线程池等
-        this.registerShutdownHook = true;
-        // 用于指定额外的Spring Profile，可以指定多个
-        this.additionalProfiles = Collections.emptySet();
-        // 使用springboot默认提供的Environment
-        this.isCustomEnvironment = false;
-        // 控制Spring应用上下文是否以懒加载方式启动，默认情况下springboot在启动时尽可能多初始化Bean，以便提前发现潜在的问题
-        this.lazyInitialization = false;
-        this.applicationContextFactory = ApplicationContextFactory.DEFAULT;
-        // 启动性能监控，帮助开发者了解springboot应用在启动过程中各个阶段的时间消耗和顺序执行，可以通过自定义实现ApplicationStartup接口，并设置到SpringApplication中，以获取更详细的启动信息
-        this.applicationStartup = ApplicationStartup.DEFAULT;
-        this.resourceLoader = resourceLoader;
-        Assert.notNull(primarySources, "PrimarySources must not be null");
-        this.primarySources = new LinkedHashSet(Arrays.asList(primarySources));
         // 推断应用类型， NONE, SERVLET, REACTIVE，通过类路径判断
         this.webApplicationType = WebApplicationType.deduceFromClasspath();
         // 对引导注册表进行初始化，可以在应用上下文初始化前进行一些提前配置，比如注册基本Bean
@@ -83,7 +59,7 @@ public ConfigurableApplicationContext run(String... args) {
         DefaultBootstrapContext bootstrapContext = this.createBootstrapContext();
         ConfigurableApplicationContext context = null;
         this.configureHeadlessProperty();
-        // 2. 从spring.factories中获取应用启动监听器（被观察者）EventPublishingRunListener，它的主要作用是在spring boot启动的不同阶段发布对应的事件
+        // 2. 从spring.factories中获取事件发布器（被观察者）EventPublishingRunListener，它的主要作用是在spring boot启动的不同阶段发布对应的事件
         SpringApplicationRunListeners listeners = this.getRunListeners(args);
         // 3. 被观察者向所有的观察者发布应用开始启动事件，LoggingApplicationListener（日志观察者）订阅到事件后记录日志
         listeners.starting(bootstrapContext, this.mainApplicationClass);
@@ -145,7 +121,7 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
         this.configureEnvironment((ConfigurableEnvironment)environment, applicationArguments.getSourceArgs());
         // 3. 将SpringBoot的配置属性源添加到Environment对象中
         ConfigurationPropertySources.attach((Environment)environment);
-        // 4. 事件发布监听器（被观察者）发布环境准备事件，被观察者（ConfigFileApplicationListener）订阅到事件后加载application.properties等配置文件
+        // 4. 事件发布监听器（被观察者）发布环境准备事件，被观察者（EnvironmentPostProcessorApplicationListener（多个EnvironmentPostProcessor） -> ConfigDataEnvironmentPostProcessor）订阅到事件后加载application.properties等配置文件
         listeners.environmentPrepared(bootstrapContext, (ConfigurableEnvironment)environment);
         // 5. 将默认配置属性源移到最后面，优先级最低
         DefaultPropertiesPropertySource.moveToEnd((ConfigurableEnvironment)environment);
@@ -182,7 +158,7 @@ private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners
 4. 关闭BootstrapContext
 5. 获取并配置BeanFactory
 6. 加载启动类
-7. 发布应用上下文刷新事件
+7. 发布应用上下文加载事件
 ```java
 private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context, ConfigurableEnvironment environment, SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
         context.setEnvironment(environment);
@@ -224,7 +200,7 @@ private void prepareContext(DefaultBootstrapContext bootstrapContext, Configurab
         // source为启动类
         Set<Object> sources = this.getAllSources();
         Assert.notEmpty(sources, "Sources must not be empty");
-        // 6. 加载启动类，将启动类中的@ComponentScan包扫描路径下的类注册为Bean
+        // 6. 加载启动类，将启动类加载未BeanDefinition
         this.load(context, sources.toArray(new Object[0]));
         // 7. 发布应用上下文加载事件
         listeners.contextLoaded(context);
