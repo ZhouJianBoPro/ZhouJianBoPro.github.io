@@ -40,10 +40,10 @@ public class DispatchHandshakeInterceptor implements HandshakeInterceptor {
 该拦截器用于获取客户端传入的token，每个token绑定了一个WebSocketSession，目的是为了实现用户与连接绑定
 
 ### 心跳机制
-> 1. 空闲连接默认在60s内没进行数据交换，会自动断开连接
-> 2. 网络等原因也可能会中断连接，比如服务端重启
-> 3. 心跳机制用于检测连接是否正常，当发现断开时，可以尝试重新建立连接
-> 4. 可以由客户端定时发送心跳请求（不超过60s）, 服务端收到请求后返回响应。该请求不会触发任何业务逻辑
+> 客户端与服务端之间的连接可能由于网络等原因导致中断（服务端重启），引入心跳机制可以及时发现断开的连接并尝试重连。
+> 客户端每隔30s向服务端通过长连接发送心跳数据（ping），服务端收到心跳包后给客户端回复心跳响应（pong）。
+> 若心跳包发送异常时，客户端可尝试重新与服务端建立连接
+
 
 ### websocket处理器
 ```java
@@ -153,29 +153,29 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     }
     ```
 4. 使用redis订阅功能监听topic消息，将消息发送给客户端
-```java
-@Component
-public class MyApplicationRunner implements ApplicationRunner {
-
-    @Resource
-    private RedissonClient redissonClient;
-
-    @Resource
-    private ProduceDispatchHandler produceDispatchHandler;
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-
-        // 订阅topic
-        RTopic topic = redissonClient.getTopic(RedisKeyConstant.TOPIC_WEBSOCKET);
-
-        // 监听topic消息，发送给客户端
-        topic.addListener(String.class, (channel, message) -> {
-            produceDispatchHandler.sendAllMessage(message);
-        });
-    }
-}
-```
+   ```java
+   @Component
+   public class MyApplicationRunner implements ApplicationRunner {
+   
+       @Resource
+       private RedissonClient redissonClient;
+   
+       @Resource
+       private ProduceDispatchHandler produceDispatchHandler;
+   
+       @Override
+       public void run(ApplicationArguments args) throws Exception {
+   
+           // 订阅topic
+           RTopic topic = redissonClient.getTopic(RedisKeyConstant.TOPIC_WEBSOCKET);
+   
+           // 监听topic消息，发送给客户端
+           topic.addListener(String.class, (channel, message) -> {
+               produceDispatchHandler.sendAllMessage(message);
+           });
+       }
+   }
+   ```
 
 
 
