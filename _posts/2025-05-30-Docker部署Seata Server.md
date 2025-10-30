@@ -155,7 +155,7 @@ tags: [concurrency]
    store.db.branchTable=branch_table
    store.db.distributedLockTable=distributed_lock
    ```
-5. 将镜像运行容器
+5. 将镜像运行容器Ï
    ```shell
    containt_name=seata-dev
    image_name=seataio/seata-server:latest
